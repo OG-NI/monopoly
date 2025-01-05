@@ -6,6 +6,12 @@ Hauptprojekt erstellen:
 mvn archetype:generate -DgroupId=de.dhbw.ase.monopoly -DartifactId=monopoly -DarchetypeArtifactId=maven-archetype-quickstart -DinteractiveMode=false
 ```
 
+In Projektverzeichnis navigieren:
+
+```shell
+cd monopoly
+```
+
 `pom.xml` bearbeiten:
 
 ```xml
