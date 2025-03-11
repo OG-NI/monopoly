@@ -30,7 +30,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>de.dhbw.ase.monopoly.Main</mainClass>
+                            <mainClass>de.dhbw.ase.monopoly.Starter</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
