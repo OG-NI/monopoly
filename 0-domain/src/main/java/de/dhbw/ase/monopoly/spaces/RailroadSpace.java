@@ -1,6 +1,6 @@
 package de.dhbw.ase.monopoly.spaces;
 
-public class RailroadSpace extends BuyableSpace {
+public class RailroadSpace extends PropertySpace {
   private static final int[] rents = new int[] { 0, 25, 50, 100, 200 };
 
   public RailroadSpace(String name) {

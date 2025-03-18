@@ -1,42 +1,40 @@
 package de.dhbw.ase.monopoly.spaces;
 
-public class PropertySpace extends BuyableSpace {
-  private final char color;
-  private final int housePrice;
-  private final int[] rents;
-  private int numberOfHouses = 0;
+import java.util.Optional;
+import de.dhbw.ase.monopoly.*;
 
-  public PropertySpace(String name, int price, int mortgage, char color, int housePrice, int[] rents) {
-    super(name, price, mortgage);
-    this.color = color;
-    this.housePrice = housePrice;
-    this.rents = rents;
+public abstract class PropertySpace extends BoardSpace {
+  protected final int price;
+  protected final int mortgage;
+  protected Optional<Player> owner = Optional.empty();
+
+  public PropertySpace(String name, int price, int mortgage) {
+    super(name);
+    this.price = price;
+    this.mortgage = mortgage;
   }
 
-  public char getColor() {
-    return color;
-  }
-
-  public int getNumberOfHouses() {
-    return (int) (Math.random() * 6);
-    //return numberOfHouses;
-  }
-
-  public void addHouse() {
-    if (numberOfHouses == 5) {
-      throw new RuntimeException("House limit exceeded.");
-    }
-
-    numberOfHouses++;
+  public Optional<Player> getOwner() {
+    return owner;
   }
 
   @Override
-  public int getRent(int steps) {
-    boolean playerOwnsWholeColor = false; // TODO check if player owns whole color group
-    if (numberOfHouses == 0 && playerOwnsWholeColor) {
-      return 2 * rents[0];
+  public void enterSpace(Player player, int steps) {
+    // space is not yet owned by a player
+    if (owner.isEmpty()) {
+      // TODO buy or auction
+      return;
     }
 
-    return rents[numberOfHouses];
+    // no action if player enters his own space
+    if (owner.get().equals(player)) {
+      return;
+    }
+
+    int rent = getRent(steps);
+    player.transferMoney(-rent);
+    owner.get().transferMoney(rent);
   }
+
+  public abstract int getRent(int steps);
 }

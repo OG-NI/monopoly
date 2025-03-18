@@ -1,6 +1,6 @@
 package de.dhbw.ase.monopoly.spaces;
 
-public class UtilitySpace extends BuyableSpace {
+public class UtilitySpace extends PropertySpace {
   private static final int[] rentMultipliers = new int[] { 0, 4, 10 };
 
   public UtilitySpace(String name) {

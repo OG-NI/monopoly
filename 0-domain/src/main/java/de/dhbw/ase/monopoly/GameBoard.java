@@ -26,51 +26,51 @@ public class GameBoard {
     boardSpaces = new BoardSpace[] {
         // bottom side
         new EmptySpace("Go"),
-        new PropertySpace("Mediterranean Avenue", 60, 30, 'b', 50, new int[] { 2, 10, 30, 90, 160, 250 }),
+        new ColoredPropertySpace("Mediterranean Avenue", 60, 30, 'b', 50, new int[] { 2, 10, 30, 90, 160, 250 }),
         communityChestSpace,
-        new PropertySpace("Baltic Avenue", 60, 30, 'b', 50, new int[] { 4, 20, 60, 180, 320, 450 }),
+        new ColoredPropertySpace("Baltic Avenue", 60, 30, 'b', 50, new int[] { 4, 20, 60, 180, 320, 450 }),
         new TaxSpace("Income Tax", 200),
         new RailroadSpace("Reading Railroad"),
-        new PropertySpace("Oriental Avenue", 100, 50, 'l', 50, new int[] { 6, 30, 90, 270, 400, 550 }),
+        new ColoredPropertySpace("Oriental Avenue", 100, 50, 'l', 50, new int[] { 6, 30, 90, 270, 400, 550 }),
         chanceSpace,
-        new PropertySpace("Vermont Avenue", 100, 50, 'l', 50, new int[] { 6, 30, 90, 270, 400, 550 }),
-        new PropertySpace("Connecticut Avenue", 120, 60, 'l', 50, new int[] { 8, 40, 100, 300, 450, 600 }),
+        new ColoredPropertySpace("Vermont Avenue", 100, 50, 'l', 50, new int[] { 6, 30, 90, 270, 400, 550 }),
+        new ColoredPropertySpace("Connecticut Avenue", 120, 60, 'l', 50, new int[] { 8, 40, 100, 300, 450, 600 }),
 
         // left side
         new EmptySpace("Jail"),
-        new PropertySpace("St. Charles Place", 140, 70, 'p', 100, new int[] { 10, 50, 150, 450, 625, 750 }),
+        new ColoredPropertySpace("St. Charles Place", 140, 70, 'p', 100, new int[] { 10, 50, 150, 450, 625, 750 }),
         new UtilitySpace("Electric Company"),
-        new PropertySpace("States Avenue", 140, 70, 'p', 100, new int[] { 10, 50, 150, 450, 625, 750 }),
-        new PropertySpace("Virginia Avenue", 160, 80, 'p', 100, new int[] { 12, 60, 180, 500, 700, 900 }),
+        new ColoredPropertySpace("States Avenue", 140, 70, 'p', 100, new int[] { 10, 50, 150, 450, 625, 750 }),
+        new ColoredPropertySpace("Virginia Avenue", 160, 80, 'p', 100, new int[] { 12, 60, 180, 500, 700, 900 }),
         new RailroadSpace("Pennsylvania Railroad"),
-        new PropertySpace("St. James Place", 180, 90, 'o', 100, new int[] { 14, 70, 200, 550, 750, 950 }),
+        new ColoredPropertySpace("St. James Place", 180, 90, 'o', 100, new int[] { 14, 70, 200, 550, 750, 950 }),
         communityChestSpace,
-        new PropertySpace("Tennessee Avenue", 180, 90, 'o', 100, new int[] { 14, 70, 200, 550, 750, 950 }),
-        new PropertySpace("New York Avenue", 200, 100, 'o', 100, new int[] { 16, 80, 220, 600, 800, 1000 }),
+        new ColoredPropertySpace("Tennessee Avenue", 180, 90, 'o', 100, new int[] { 14, 70, 200, 550, 750, 950 }),
+        new ColoredPropertySpace("New York Avenue", 200, 100, 'o', 100, new int[] { 16, 80, 220, 600, 800, 1000 }),
 
         // top side
         new EmptySpace("Free Parking"),
-        new PropertySpace("Kentucky Avenue", 220, 110, 'r', 150, new int[] { 18, 90, 250, 700, 875, 1050 }),
+        new ColoredPropertySpace("Kentucky Avenue", 220, 110, 'r', 150, new int[] { 18, 90, 250, 700, 875, 1050 }),
         chanceSpace,
-        new PropertySpace("Indiana Avenue", 220, 110, 'r', 150, new int[] { 18, 90, 250, 700, 875, 1050 }),
-        new PropertySpace("Illinois Avenue", 240, 120, 'r', 150, new int[] { 20, 100, 300, 750, 925, 1100 }),
+        new ColoredPropertySpace("Indiana Avenue", 220, 110, 'r', 150, new int[] { 18, 90, 250, 700, 875, 1050 }),
+        new ColoredPropertySpace("Illinois Avenue", 240, 120, 'r', 150, new int[] { 20, 100, 300, 750, 925, 1100 }),
         new RailroadSpace("B. & O. Railroad"),
-        new PropertySpace("Atlantic Avenue", 260, 130, 'y', 150, new int[] { 22, 110, 330, 800, 975, 1150 }),
-        new PropertySpace("Ventnor Avenue", 260, 130, 'y', 150, new int[] { 22, 110, 330, 800, 975, 1150 }),
+        new ColoredPropertySpace("Atlantic Avenue", 260, 130, 'y', 150, new int[] { 22, 110, 330, 800, 975, 1150 }),
+        new ColoredPropertySpace("Ventnor Avenue", 260, 130, 'y', 150, new int[] { 22, 110, 330, 800, 975, 1150 }),
         new UtilitySpace("Water Works"),
-        new PropertySpace("Marvin Gardens", 280, 140, 'y', 150, new int[] { 24, 120, 360, 850, 1025, 1200 }),
+        new ColoredPropertySpace("Marvin Gardens", 280, 140, 'y', 150, new int[] { 24, 120, 360, 850, 1025, 1200 }),
 
         // right side
         new GoToJailSpace(),
-        new PropertySpace("Pacific Avenue", 300, 150, 'g', 200, new int[] { 26, 130, 390, 900, 1100, 1275 }),
-        new PropertySpace("North Carolina Avenue", 300, 150, 'g', 200, new int[] { 26, 130, 390, 900, 1100, 1275 }),
+        new ColoredPropertySpace("Pacific Avenue", 300, 150, 'g', 200, new int[] { 26, 130, 390, 900, 1100, 1275 }),
+        new ColoredPropertySpace("North Carolina Avenue", 300, 150, 'g', 200, new int[] { 26, 130, 390, 900, 1100, 1275 }),
         communityChestSpace,
-        new PropertySpace("Pennsylvania Avenue", 320, 160, 'g', 200, new int[] { 28, 150, 450, 1000, 1200, 1400 }),
+        new ColoredPropertySpace("Pennsylvania Avenue", 320, 160, 'g', 200, new int[] { 28, 150, 450, 1000, 1200, 1400 }),
         new RailroadSpace("Short Line"),
         chanceSpace,
-        new PropertySpace("Park Place", 350, 175, 'd', 200, new int[] { 35, 175, 500, 1100, 1300, 1500 }),
+        new ColoredPropertySpace("Park Place", 350, 175, 'd', 200, new int[] { 35, 175, 500, 1100, 1300, 1500 }),
         new TaxSpace("Luxury Tax", 100),
-        new PropertySpace("Boardwalk", 400, 200, 'd', 200, new int[] { 50, 200, 600, 1400, 1700, 2000 }),
+        new ColoredPropertySpace("Boardwalk", 400, 200, 'd', 200, new int[] { 50, 200, 600, 1400, 1700, 2000 }),
     };
   }
 
@@ -78,7 +78,7 @@ public class GameBoard {
     boardSpaces[position].enterSpace(player, steps);
   }
 
-  public BuyableSpace[] getBuyableSpaces() {
-    return Arrays.stream(boardSpaces).filter(space -> space instanceof BuyableSpace).toArray(BuyableSpace[]::new);
+  public PropertySpace[] getPropertySpaces() {
+    return Arrays.stream(boardSpaces).filter(space -> space instanceof PropertySpace).toArray(PropertySpace[]::new);
   }
 }

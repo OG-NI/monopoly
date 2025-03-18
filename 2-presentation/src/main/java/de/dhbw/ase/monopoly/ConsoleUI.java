@@ -8,8 +8,8 @@ import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
-import de.dhbw.ase.monopoly.spaces.BuyableSpace;
 import de.dhbw.ase.monopoly.spaces.PropertySpace;
+import de.dhbw.ase.monopoly.spaces.ColoredPropertySpace;
 import de.dhbw.ase.monopoly.spaces.RailroadSpace;
 import de.dhbw.ase.monopoly.spaces.UtilitySpace;
 
@@ -20,7 +20,7 @@ public class ConsoleUI {
   private Scanner scanner = new Scanner(System.in);
 
   public void start() {
-    //String[] pieces = readPlayerPieces();
+    // String[] pieces = readPlayerPieces();
     String[] pieces = Arrays.stream(Piece.values()).map(Piece::toString).toArray(String[]::new);
     game = new Game(pieces);
     while (true) {
@@ -74,7 +74,7 @@ public class ConsoleUI {
     clearConsole();
     System.out.println(String.join("\n", getBoard()));
     printTable(getPlayersState());
-    printTable(getBuyableSpacesState());
+    printTable(getPropertySpacesState());
   }
 
   private void printHelp() {
@@ -114,7 +114,7 @@ public class ConsoleUI {
   }
 
   private String[] getBoard() {
-    String property = "▔▔▔";
+    String coloredProperty = "▔▔▔";
     String rowSeparator = "├───┤                                   ├───┤";
     String rowSpacer = "│                                   │";
     String rowDelimiter = "│";
@@ -123,14 +123,14 @@ public class ConsoleUI {
     String chestStack = "│               " + colorText("  󰜦  ", WHITE, BLUE) + "               │";
     String chanceStack = "│               " + colorText("    ", WHITE, ORANGE) + "               │";
 
-    String brownProperty = colorText(property, BROWN, BACKGROUND);
-    String lightBlueProperty = colorText(property, LIGHT_BLUE, BACKGROUND);
-    String pinkProperty = colorText(property, PINK, BACKGROUND);
-    String orangeProperty = colorText(property, ORANGE, BACKGROUND);
-    String redProperty = colorText(property, RED, BACKGROUND);
-    String yellowProperty = colorText(property, YELLOW, BACKGROUND);
-    String greenProperty = colorText(property, GREEN, BACKGROUND);
-    String blueProperty = colorText(property, DARK_BLUE, BACKGROUND);
+    String brownProperty = colorText(coloredProperty, BROWN, BACKGROUND);
+    String lightBlueProperty = colorText(coloredProperty, LIGHT_BLUE, BACKGROUND);
+    String pinkProperty = colorText(coloredProperty, PINK, BACKGROUND);
+    String orangeProperty = colorText(coloredProperty, ORANGE, BACKGROUND);
+    String redProperty = colorText(coloredProperty, RED, BACKGROUND);
+    String yellowProperty = colorText(coloredProperty, YELLOW, BACKGROUND);
+    String greenProperty = colorText(coloredProperty, GREEN, BACKGROUND);
+    String blueProperty = colorText(coloredProperty, DARK_BLUE, BACKGROUND);
 
     String chest = colorText(" 󰜦 ", BLUE, BACKGROUND);
     String pinkChance = colorText("  ", PINK, BACKGROUND);
@@ -175,22 +175,22 @@ public class ConsoleUI {
     return board;
   }
 
-  private String[][] getBuyableSpacesState() {
-    BuyableSpace[] buyableSpaces = game.getGameBoard().getBuyableSpaces();
-    String[][] state = new String[buyableSpaces.length + 1][5];
+  private String[][] getPropertySpacesState() {
+    PropertySpace[] propertySpaces = game.getGameBoard().getPropertySpaces();
+    String[][] state = new String[propertySpaces.length + 1][5];
     state[0] = new String[] { "", "Buildings", "Name", "Owner", "Rent" };
 
-    for (int i = 0; i < buyableSpaces.length; i++) {
-      state[i + 1][0] = getIconForBuyableSpace(buyableSpaces[i]);
-      state[i + 1][1] = getIconForBuildings(buyableSpaces[i]);
-      state[i + 1][2] = buyableSpaces[i].getName();
-      Optional<Player> owner = buyableSpaces[i].getOwner();
+    for (int i = 0; i < propertySpaces.length; i++) {
+      state[i + 1][0] = getIconForPropertySpace(propertySpaces[i]);
+      state[i + 1][1] = getIconForBuildings(propertySpaces[i]);
+      state[i + 1][2] = propertySpaces[i].getName();
+      Optional<Player> owner = propertySpaces[i].getOwner();
       if (owner.isPresent()) {
         state[i + 1][3] = colorText(owner.get().getPiece(), GRAY);
-        if (buyableSpaces[i] instanceof UtilitySpace) {
+        if (propertySpaces[i] instanceof UtilitySpace) {
           state[i + 1][4] = "";
         } else {
-          state[i + 1][4] = buyableSpaces[i].getRent(1) + " $";
+          state[i + 1][4] = propertySpaces[i].getRent(1) + " $";
         }
       } else {
         state[i + 1][3] = "";
@@ -216,28 +216,28 @@ public class ConsoleUI {
     return playersState;
   }
 
-  private String getIconForBuyableSpace(BuyableSpace space) {
-    if (space instanceof PropertySpace) {
-      PropertySpace propertySpace = (PropertySpace) space;
-      Color color = Color.byChar(propertySpace.getColor());
+  private String getIconForPropertySpace(PropertySpace propertySpace) {
+    if (propertySpace instanceof ColoredPropertySpace) {
+      ColoredPropertySpace coloredPropertySpace = (ColoredPropertySpace) propertySpace;
+      Color color = Color.byChar(coloredPropertySpace.getColor());
       return colorText("▔▔▔", color, Color.BACKGROUND);
-    } else if (space instanceof RailroadSpace) {
+    } else if (propertySpace instanceof RailroadSpace) {
       return colorText("  ", BLACK, BACKGROUND);
-    } else if (space.getName().equals("Electric Company")) {
+    } else if (propertySpace.getName().equals("Electric Company")) {
       return colorText(" 󱠃 ", BLACK, BACKGROUND);
-    } else if (space.getName().equals("Water Works")) {
+    } else if (propertySpace.getName().equals("Water Works")) {
       return colorText(" 󰖏 ", BLACK, BACKGROUND);
     }
-    throw new RuntimeException("Invalid buyable board space.");
+    throw new RuntimeException("Invalid property space.");
   }
 
-  private String getIconForBuildings(BuyableSpace buyableSpace) {
-    if (!(buyableSpace instanceof PropertySpace)) {
+  private String getIconForBuildings(PropertySpace propertySpace) {
+    if (!(propertySpace instanceof ColoredPropertySpace)) {
       return "";
     }
 
-    PropertySpace propertySpace = (PropertySpace) buyableSpace;
-    int numberOfHouses = propertySpace.getNumberOfHouses();
+    ColoredPropertySpace coloredPropertySpace = (ColoredPropertySpace) propertySpace;
+    int numberOfHouses = coloredPropertySpace.getNumberOfHouses();
     if (numberOfHouses <= 4) {
       return colorText(" ".repeat(numberOfHouses), GREEN);
     } else {
