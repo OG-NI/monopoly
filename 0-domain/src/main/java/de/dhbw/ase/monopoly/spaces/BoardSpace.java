@@ -9,5 +9,9 @@ public abstract class BoardSpace {
     this.name = name;
   }
 
+  public String getName() {
+    return name;
+  }
+
   public abstract void enterSpace(Player player, int steps);
 }

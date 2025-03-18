@@ -2,6 +2,9 @@ package de.dhbw.ase.monopoly.spaces;
 
 import de.dhbw.ase.monopoly.*;
 
+/**
+ * aggregate
+ */
 public class ActionSpace extends BoardSpace {
   private final ActionCard[] actionCards;
 
@@ -13,6 +16,6 @@ public class ActionSpace extends BoardSpace {
   @Override
   public void enterSpace(Player player, int steps) {
     int cardIdx = (int) (Math.random() * actionCards.length);
-    actionCards[cardIdx].action(player);
+    actionCards[cardIdx].performAction(player);
   }
 }

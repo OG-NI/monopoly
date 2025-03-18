@@ -8,7 +8,7 @@ public class RailroadSpace extends BuyableSpace {
   }
 
   @Override
-  protected int getRent() {
+  public int getRent(int steps) {
     int ownedRailroads = owner.get().getOwnedRailroads();
     return rents[ownedRailroads];
   }

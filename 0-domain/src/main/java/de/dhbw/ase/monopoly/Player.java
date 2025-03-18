@@ -6,7 +6,7 @@ public class Player {
   private final static int COLLECT_ON_GO_MONEY = 200;
   private final static int GET_OUT_OF_JAIL_MONEY = -50;
 
-  private final String name;
+  private final String piece;
   private final GameBoard gameBoard;
 
   private int money = START_MONEY;
@@ -19,13 +19,25 @@ public class Player {
   private int consecutiveNotDoublesInJail = 0;
   private boolean isInJail = false;
 
-  public Player(String name, GameBoard gameBoard) {
-    this.name = name;
+  public Player(String piece, GameBoard gameBoard) {
+    this.piece = piece;
     this.gameBoard = gameBoard;
+  }
+
+  public String getPiece() {
+    return piece;
+  }
+
+  public int getMoney() {
+    return money;
   }
 
   public void transferMoney(int amount) {
     money += amount;
+  }
+
+  public int getPosition() {
+    return position;
   }
 
   public void moveForward(int steps) {
@@ -34,7 +46,7 @@ public class Player {
       position -= BOARD_SIZE;
       money += COLLECT_ON_GO_MONEY;
     }
-    gameBoard.enterSpace(this, steps);
+    gameBoard.enterSpace(position, this, steps);
   }
 
   public void moveToPosition(int position) {
@@ -45,8 +57,20 @@ public class Player {
     }
   }
 
-  public int getPosition() {
-    return position;
+  public void moveToNearestRailroad() {
+    int shiftedPos = (position + 5) % BOARD_SIZE;
+    int railroadIdx = shiftedPos / 10;
+    int railroadPos = railroadIdx * 10 + 5;
+    // TODO pay twice the rent
+    moveToPosition(railroadPos);
+  }
+
+  public void moveToNearestUtility() {
+    int shiftedPos = (position + 12) % BOARD_SIZE;
+    int utilityIdx = shiftedPos / 24;
+    int utilityPos = utilityIdx * 16 + 12;
+    // TODO throw dice and pay owner ten times amount thrown
+    moveToPosition(utilityPos);
   }
 
   public int getOwnedRailroads() {
@@ -63,6 +87,10 @@ public class Player {
 
   public int getOwnedHotels() {
     return ownedHotels;
+  }
+
+  public int getGetOutOfJailFreeCards() {
+    return getOutOfJailFreeCards;
   }
 
   public void incGetOutOfJailFreeCards() {

@@ -8,7 +8,7 @@ public class UtilitySpace extends BuyableSpace {
   }
 
   @Override
-  protected int getRent(int steps) {
+  public int getRent(int steps) {
     int ownedUtilities = owner.get().getOwnedUtilities();
     return rentMultipliers[ownedUtilities] * steps;
   }

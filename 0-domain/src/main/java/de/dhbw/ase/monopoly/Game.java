@@ -1,6 +1,5 @@
 package de.dhbw.ase.monopoly;
 
-import de.dhbw.ase.monopoly.spaces.*;
 import java.util.Arrays;
 
 public class Game {
@@ -11,13 +10,22 @@ public class Game {
   private int consecutiveDoubles = 0;
 
   public Game(String[] playerNames) {
-    ActionCard[] communityChestCards = ActionCardFactory.initCommunityChestCards(players);
-    ActionCard[] chanceCards = ActionCardFactory.initChanceCards(players);
-    gameBoard = new GameBoard(communityChestCards, chanceCards);
-
+    gameBoard = new GameBoard(this);
     players = Arrays.stream(playerNames)
         .map(name -> new Player(name, gameBoard)).toArray(Player[]::new);
     curPlayerIdx = (int) (Math.random() * playerNames.length);
+  }
+
+  public GameBoard getGameBoard() {
+    return gameBoard;
+  }
+
+  public Player[] getPlayers() {
+    return players;
+  }
+
+  public int getCurPlayerIdx() {
+    return curPlayerIdx;
   }
 
   public void rollDice() {
@@ -32,10 +40,13 @@ public class Game {
 
     if (curPlayer.isInJail()) {
       if (die1 == die2) {
+        // leave jail for free after rolling doubles
         curPlayer.getOutOfJail(true);
       } else {
         curPlayer.incConsecutiveNotDoublesInJail();
         if (curPlayer.mustGetOutOfJail()) {
+          // player must get out of jail after not rolling doubles for three rounds while
+          // being in jail
           curPlayer.getOutOfJail(false);
         } else {
           return;
@@ -46,9 +57,11 @@ public class Game {
         consecutiveDoubles++;
 
         if (consecutiveDoubles == 3) {
+          // player must to to jail after rolling doubles for three rounds
           curPlayer.goToJail();
           return;
         } else {
+          // player can roll again after rolling doubles without going to jail
           canRollAgain = true;
         }
       } else {
@@ -72,6 +85,12 @@ public class Game {
       return;
     }
     curPlayerIdx = (curPlayerIdx + 1) % players.length;
+  }
+
+  public void transferMoneyWithEveryPlayer(int money) {
+    Arrays.stream(players).forEach(p -> p.transferMoney(-money));
+    int totalMoney = money * players.length;
+    players[curPlayerIdx].transferMoney(totalMoney);
   }
 
   private int randomDice() {

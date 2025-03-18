@@ -7,11 +7,15 @@ public abstract class BuyableSpace extends BoardSpace {
   protected final int price;
   protected final int mortgage;
   protected Optional<Player> owner = Optional.empty();
-  
+
   public BuyableSpace(String name, int price, int mortgage) {
     super(name);
     this.price = price;
     this.mortgage = mortgage;
+  }
+
+  public Optional<Player> getOwner() {
+    return owner;
   }
 
   @Override
@@ -32,5 +36,5 @@ public abstract class BuyableSpace extends BoardSpace {
     owner.get().transferMoney(rent);
   }
 
-  protected abstract int getRent(int steps);
+  public abstract int getRent(int steps);
 }
