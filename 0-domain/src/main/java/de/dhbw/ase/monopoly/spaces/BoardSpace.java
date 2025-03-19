@@ -13,5 +13,9 @@ public abstract class BoardSpace {
     return name;
   }
 
+  public boolean isBuyable() {
+    return false;
+  }
+
   public abstract void enterSpace(Player player, int steps);
 }

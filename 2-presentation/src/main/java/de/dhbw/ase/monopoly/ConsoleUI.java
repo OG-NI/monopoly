@@ -21,7 +21,7 @@ public class ConsoleUI {
 
   public void start() {
     // String[] pieces = readPlayerPieces();
-    String[] pieces = Arrays.stream(Piece.values()).map(Piece::toString).toArray(String[]::new);
+    String[] pieces = new String[] { Piece.DOG.toString(), Piece.SHIP.toString() };
     game = new Game(pieces);
     while (true) {
       printGameState();
@@ -84,23 +84,29 @@ public class ConsoleUI {
         help:\tdisplay this help page
         quit:\tleave the game
         roll:\troll the dice
+        buy:\tbuy property
+        leave:\tleave jail using a card or paying the 50$ fee
         next:\tend the turn and pass on to the next player""");
     waitForEnter();
   }
 
   private void readAndExecuteCommand() {
-    // TODO add buy, auction, leave jail
+    // TODO add auction
     String command = readInput();
     clearConsole();
-    String[] token = command.split(" ");
+    String[] tokens = command.split(" ");
 
-    if (token[0].equals("help")) {
+    if (tokens[0].equals("help")) {
       printHelp();
-    } else if (token[0].equals("quit")) {
+    } else if (tokens[0].equals("quit")) {
       System.exit(0);
-    } else if (token[0].equals("roll")) {
+    } else if (tokens[0].equals("roll")) {
       game.rollDice();
-    } else if (token[0].equals("next")) {
+    } else if (tokens[0].equals("buy")) {
+      game.buyProperty();
+    } else if (tokens[0].equals("leave")) {
+      game.getOutOfJail();
+    } else if (tokens[0].equals("next")) {
       game.endTurn();
     }
   }
@@ -178,12 +184,12 @@ public class ConsoleUI {
   private String[][] getPropertySpacesState() {
     PropertySpace[] propertySpaces = game.getGameBoard().getPropertySpaces();
     String[][] state = new String[propertySpaces.length + 1][5];
-    state[0] = new String[] { "", "Buildings", "Name", "Owner", "Rent" };
+    state[0] = new String[] { "", "Name", "Buildings", "Owner", "Rent" };
 
     for (int i = 0; i < propertySpaces.length; i++) {
       state[i + 1][0] = getIconForPropertySpace(propertySpaces[i]);
-      state[i + 1][1] = getIconForBuildings(propertySpaces[i]);
-      state[i + 1][2] = propertySpaces[i].getName();
+      state[i + 1][1] = propertySpaces[i].getName();
+      state[i + 1][2] = getIconForBuildings(propertySpaces[i]);
       Optional<Player> owner = propertySpaces[i].getOwner();
       if (owner.isPresent()) {
         state[i + 1][3] = colorText(owner.get().getPiece(), GRAY);
@@ -207,7 +213,11 @@ public class ConsoleUI {
 
     for (int i = 0; i < players.length; i++) {
       boolean isPlayerActive = game.getCurPlayerIdx() == i;
-      playersState[i + 1][0] = isPlayerActive ? "" : "";
+      if (isPlayerActive) {
+        playersState[i + 1][0] = game.canRollDice() ? " " : " ";
+      } else {
+        playersState[i + 1][0] = "";
+      }
       playersState[i + 1][1] = colorText(players[i].getPiece(), GRAY);
       playersState[i + 1][2] = String.valueOf(players[i].getMoney()) + " $";
       playersState[i + 1][3] = String.valueOf(players[i].getGetOutOfJailFreeCards());

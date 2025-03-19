@@ -14,15 +14,27 @@ public abstract class PropertySpace extends BoardSpace {
     this.mortgage = mortgage;
   }
 
+  public int getPrice() {
+    return price;
+  }
+
   public Optional<Player> getOwner() {
     return owner;
+  }
+
+  public void setOwner(Optional<Player> owner) {
+    this.owner = owner;
+  }
+
+  @Override
+  public boolean isBuyable() {
+    return owner.isEmpty();
   }
 
   @Override
   public void enterSpace(Player player, int steps) {
     // space is not yet owned by a player
     if (owner.isEmpty()) {
-      // TODO buy or auction
       return;
     }
 

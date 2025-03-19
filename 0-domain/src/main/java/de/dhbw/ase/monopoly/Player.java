@@ -1,5 +1,11 @@
 package de.dhbw.ase.monopoly;
 
+import java.util.Optional;
+
+import de.dhbw.ase.monopoly.spaces.PropertySpace;
+import de.dhbw.ase.monopoly.spaces.RailroadSpace;
+import de.dhbw.ase.monopoly.spaces.UtilitySpace;
+
 public class Player {
   private final static int BOARD_SIZE = 40;
   private final static int START_MONEY = 1500;
@@ -44,7 +50,7 @@ public class Player {
     position += steps;
     if (position >= BOARD_SIZE) {
       position -= BOARD_SIZE;
-      money += COLLECT_ON_GO_MONEY;
+      transferMoney(COLLECT_ON_GO_MONEY);
     }
     gameBoard.enterSpace(position, this, steps);
   }
@@ -87,6 +93,19 @@ public class Player {
 
   public int getOwnedHotels() {
     return ownedHotels;
+  }
+
+  public void buyProperty() {
+    PropertySpace propertySpace = (PropertySpace) gameBoard.getSpace(position);
+    transferMoney(-propertySpace.getPrice());
+    propertySpace.setOwner(Optional.of(this));
+
+    if (propertySpace instanceof RailroadSpace) {
+      ownedRailroads++;
+    }
+    if (propertySpace instanceof UtilitySpace) {
+      ownedUtilities++;
+    }
   }
 
   public int getGetOutOfJailFreeCards() {

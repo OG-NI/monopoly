@@ -18,8 +18,7 @@ public class ColoredPropertySpace extends PropertySpace {
   }
 
   public int getNumberOfHouses() {
-    return (int) (Math.random() * 6);
-    // return numberOfHouses;
+    return numberOfHouses;
   }
 
   public void addHouse() {

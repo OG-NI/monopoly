@@ -81,4 +81,8 @@ public class GameBoard {
   public PropertySpace[] getPropertySpaces() {
     return Arrays.stream(boardSpaces).filter(space -> space instanceof PropertySpace).toArray(PropertySpace[]::new);
   }
+
+  public BoardSpace getSpace(int position) {
+    return boardSpaces[position];
+  }
 }

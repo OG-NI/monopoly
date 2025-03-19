@@ -2,17 +2,20 @@ package de.dhbw.ase.monopoly;
 
 import java.util.Arrays;
 
+import de.dhbw.ase.monopoly.spaces.BoardSpace;
+import de.dhbw.ase.monopoly.spaces.PropertySpace;
+
 public class Game {
   private GameBoard gameBoard;
   private final Player[] players;
   private int curPlayerIdx;
-  private boolean canRollAgain = true;
+  private boolean canRollDice = true;
   private int consecutiveDoubles = 0;
 
   public Game(String[] playerNames) {
     gameBoard = new GameBoard(this);
     players = Arrays.stream(playerNames)
-        .map(name -> new Player(name, gameBoard)).toArray(Player[]::new);
+        .map(piece -> new Player(piece, gameBoard)).toArray(Player[]::new);
     curPlayerIdx = (int) (Math.random() * playerNames.length);
   }
 
@@ -29,10 +32,10 @@ public class Game {
   }
 
   public void rollDice() {
-    if (!canRollAgain) {
+    if (!canRollDice) {
       return;
     }
-    canRollAgain = false;
+    canRollDice = false;
     Player curPlayer = players[curPlayerIdx];
 
     int die1 = randomDice();
@@ -62,7 +65,7 @@ public class Game {
           return;
         } else {
           // player can roll again after rolling doubles without going to jail
-          canRollAgain = true;
+          canRollDice = true;
         }
       } else {
         consecutiveDoubles = 0;
@@ -73,17 +76,39 @@ public class Game {
     curPlayer.moveForward(steps);
   }
 
+  public boolean canRollDice() {
+    return canRollDice;
+  }
+
+  public void buyProperty() {
+    Player curPlayer = players[curPlayerIdx];
+    BoardSpace curSpace = gameBoard.getSpace(curPlayer.getPosition());
+
+    if (!curSpace.isBuyable()) {
+      return;
+    }
+
+    PropertySpace propertySpace = (PropertySpace) curSpace;
+    int propertyPrice = propertySpace.getPrice();
+    if (propertyPrice > curPlayer.getMoney()) {
+      return;
+    }
+
+    curPlayer.buyProperty();
+  }
+
   public void getOutOfJail() {
     Player curPlayer = players[curPlayerIdx];
-    if (canRollAgain && curPlayer.isInJail()) {
+    if (canRollDice && curPlayer.isInJail()) {
       curPlayer.getOutOfJail(false);
     }
   }
 
   public void endTurn() {
-    if (canRollAgain) {
+    if (canRollDice) {
       return;
     }
+    canRollDice = true;
     curPlayerIdx = (curPlayerIdx + 1) % players.length;
   }
 
