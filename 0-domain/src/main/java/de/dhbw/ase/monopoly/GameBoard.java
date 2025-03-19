@@ -37,7 +37,7 @@ public class GameBoard {
         new ColoredPropertySpace("Connecticut Avenue", 120, 60, 'l', 50, new int[] { 8, 40, 100, 300, 450, 600 }),
 
         // left side
-        new EmptySpace("Jail"),
+        new EmptySpace("Jail Just Visiting"),
         new ColoredPropertySpace("St. Charles Place", 140, 70, 'p', 100, new int[] { 10, 50, 150, 450, 625, 750 }),
         new UtilitySpace("Electric Company"),
         new ColoredPropertySpace("States Avenue", 140, 70, 'p', 100, new int[] { 10, 50, 150, 450, 625, 750 }),
@@ -74,8 +74,8 @@ public class GameBoard {
     };
   }
 
-  public void enterSpace(int position, Player player, int steps) {
-    boardSpaces[position].enterSpace(player, steps);
+  public String enterSpace(int position, Player player, int steps) {
+    return boardSpaces[position].enterSpace(player, steps);
   }
 
   public PropertySpace[] getPropertySpaces() {

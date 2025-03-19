@@ -8,7 +8,8 @@ public class GoToJailSpace extends BoardSpace {
   }
 
   @Override
-  public void enterSpace(Player player, int steps) {
+  public String enterSpace(Player player, int steps) {
     player.goToJail();
+    return "You entered the Go To Jail space and went directly to jail.";
   }
 }

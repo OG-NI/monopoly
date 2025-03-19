@@ -32,20 +32,28 @@ public abstract class PropertySpace extends BoardSpace {
   }
 
   @Override
-  public void enterSpace(Player player, int steps) {
+  public String enterSpace(Player player, int steps) {
+    String spaceMessage = String.format("You entered %s.", name);
+
     // space is not yet owned by a player
     if (owner.isEmpty()) {
-      return;
+      String buyMessage = String.format("The property is owned by the bank and can be bought for %d$.", price);
+      return UtilService.joinMessages(spaceMessage, buyMessage);
     }
 
     // no action if player enters his own space
     if (owner.get().equals(player)) {
-      return;
+      return UtilService.joinMessages(spaceMessage, "The property belongs to you.");
     }
+
+    // TODO check for mortgaged property
 
     int rent = getRent(steps);
     player.transferMoney(-rent);
     owner.get().transferMoney(rent);
+    String rentMessage = String.format("The property is owned by %s who collected %s$ in rent from you.",
+        owner.get().getPiece(), rent);
+    return UtilService.joinMessages(spaceMessage, rentMessage);
   }
 
   public abstract int getRent(int steps);

@@ -14,8 +14,11 @@ public class ActionSpace extends BoardSpace {
   }
 
   @Override
-  public void enterSpace(Player player, int steps) {
+  public String enterSpace(Player player, int steps) {
     int cardIdx = (int) (Math.random() * actionCards.length);
-    actionCards[cardIdx].performAction(player);
+    String enterMessage = String.format("You entered a %s space and drew a card:", name);
+    String cardMessage = actionCards[cardIdx].getText();
+    String actionMessage = actionCards[cardIdx].performAction(player);
+    return UtilService.joinMessages(enterMessage, cardMessage, actionMessage);
   }
 }

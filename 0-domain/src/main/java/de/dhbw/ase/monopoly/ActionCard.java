@@ -7,5 +7,9 @@ public abstract class ActionCard { // TODO: extends value object
     this.text = text;
   }
 
-  public abstract void performAction(Player player);
+  public String getText() {
+    return text;
+  }
+
+  public abstract String performAction(Player player);
 }

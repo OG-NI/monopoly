@@ -101,7 +101,7 @@ public class ConsoleUI {
     } else if (tokens[0].equals("quit")) {
       System.exit(0);
     } else if (tokens[0].equals("roll")) {
-      game.rollDice();
+      printMessageAndWait(game.rollDice());
     } else if (tokens[0].equals("buy")) {
       game.buyProperty();
     } else if (tokens[0].equals("leave")) {
@@ -294,6 +294,12 @@ public class ConsoleUI {
 
   private void clearConsole() {
     System.out.print("\033[H\033[2J");
+  }
+
+  private void printMessageAndWait(String message) {
+    clearConsole();
+    System.out.println(message);
+    waitForEnter();
   }
 
   private int ansiStringLength(String s) {

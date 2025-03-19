@@ -11,7 +11,8 @@ public class TaxSpace extends BoardSpace {
   }
 
   @Override
-  public void enterSpace(Player player, int steps) {
+  public String enterSpace(Player player, int steps) {
     player.transferMoney(-tax);
+    return String.format("You were charged %d in %s.", tax, name);
   }
 }

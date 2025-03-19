@@ -17,5 +17,5 @@ public abstract class BoardSpace {
     return false;
   }
 
-  public abstract void enterSpace(Player player, int steps);
+  public abstract String enterSpace(Player player, int steps);
 }

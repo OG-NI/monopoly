@@ -31,38 +31,42 @@ public class Game {
     return curPlayerIdx;
   }
 
-  public void rollDice() {
+  public String rollDice() {
     if (!canRollDice) {
-      return;
+      return "You can not cast dice again.";
     }
+
     canRollDice = false;
     Player curPlayer = players[curPlayerIdx];
-
     int die1 = randomDice();
     int die2 = randomDice();
 
+    String doublesJailMessage = "";
     if (curPlayer.isInJail()) {
       if (die1 == die2) {
-        // leave jail for free after rolling doubles
+        // leave jail for free after rolling doubles, use same roll to move
         curPlayer.getOutOfJail(true);
+        doublesJailMessage = "You rolled doubles and got out of jail for free.";
       } else {
         curPlayer.incConsecutiveNotDoublesInJail();
         if (curPlayer.mustGetOutOfJail()) {
           // player must get out of jail after not rolling doubles for three rounds while
-          // being in jail
+          // being in jail, use same roll to move
           curPlayer.getOutOfJail(false);
+          doublesJailMessage = "You did not roll doubles three rounds in a row and had to get out of jail at your own expense.";
         } else {
-          return;
+          return "You did not roll doubles and stay in jail.";
         }
       }
     } else { // player is not in jail
       if (die1 == die2) {
         consecutiveDoubles++;
+        doublesJailMessage = "You rolled doubles and can therefore roll another time.";
 
         if (consecutiveDoubles == 3) {
           // player must to to jail after rolling doubles for three rounds
           curPlayer.goToJail();
-          return;
+          return "You were speeding. Go to jail immediately.";
         } else {
           // player can roll again after rolling doubles without going to jail
           canRollDice = true;
@@ -73,7 +77,8 @@ public class Game {
     }
 
     int steps = die1 + die2;
-    curPlayer.moveForward(steps);
+    String moveMessage = curPlayer.moveForward(steps);
+    return UtilService.joinMessages(doublesJailMessage, moveMessage);
   }
 
   public boolean canRollDice() {

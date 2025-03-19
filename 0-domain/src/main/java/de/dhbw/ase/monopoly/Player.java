@@ -9,7 +9,6 @@ import de.dhbw.ase.monopoly.spaces.UtilitySpace;
 public class Player {
   private final static int BOARD_SIZE = 40;
   private final static int START_MONEY = 1500;
-  private final static int COLLECT_ON_GO_MONEY = 200;
   private final static int GET_OUT_OF_JAIL_MONEY = -50;
 
   private final String piece;
@@ -46,37 +45,40 @@ public class Player {
     return position;
   }
 
-  public void moveForward(int steps) {
+  public String moveForward(int steps) {
+    String passGoMessage = "";
     position += steps;
     if (position >= BOARD_SIZE) {
       position -= BOARD_SIZE;
-      transferMoney(COLLECT_ON_GO_MONEY);
+      transferMoney(200);
+      passGoMessage += "You passed go and collected 200$.";
     }
-    gameBoard.enterSpace(position, this, steps);
+    String spaceMessage = gameBoard.enterSpace(position, this, steps);
+    return UtilService.joinMessages(passGoMessage, spaceMessage);
   }
 
-  public void moveToPosition(int position) {
+  public String moveToPosition(int position) {
     if (position > this.position) {
-      moveForward(position - this.position);
+      return moveForward(position - this.position);
     } else {
-      moveForward(BOARD_SIZE + position - this.position);
+      return moveForward(BOARD_SIZE + position - this.position);
     }
   }
 
-  public void moveToNearestRailroad() {
+  public String moveToNearestRailroad() {
     int shiftedPos = (position + 5) % BOARD_SIZE;
     int railroadIdx = shiftedPos / 10;
     int railroadPos = railroadIdx * 10 + 5;
     // TODO pay twice the rent
-    moveToPosition(railroadPos);
+    return moveToPosition(railroadPos);
   }
 
-  public void moveToNearestUtility() {
+  public String moveToNearestUtility() {
     int shiftedPos = (position + 12) % BOARD_SIZE;
     int utilityIdx = shiftedPos / 24;
     int utilityPos = utilityIdx * 16 + 12;
     // TODO throw dice and pay owner ten times amount thrown
-    moveToPosition(utilityPos);
+    return moveToPosition(utilityPos);
   }
 
   public int getOwnedRailroads() {

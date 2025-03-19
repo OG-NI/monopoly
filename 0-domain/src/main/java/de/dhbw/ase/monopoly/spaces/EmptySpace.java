@@ -8,7 +8,8 @@ public class EmptySpace extends BoardSpace {
   }
 
   @Override
-  public void enterSpace(Player player, int steps) {
+  public String enterSpace(Player player, int steps) {
     // do nothing
+    return String.format("You entered %s.", name);
   }
 }
