@@ -85,36 +85,48 @@ public class Game {
     return canRollDice;
   }
 
-  public void buyProperty() {
+  public String buyProperty() {
     Player curPlayer = players[curPlayerIdx];
     BoardSpace curSpace = gameBoard.getSpace(curPlayer.getPosition());
 
     if (!curSpace.isBuyable()) {
-      return;
+      return "The property is not for sale.";
     }
 
     PropertySpace propertySpace = (PropertySpace) curSpace;
     int propertyPrice = propertySpace.getPrice();
     if (propertyPrice > curPlayer.getMoney()) {
-      return;
+      return "You can not afford this property";
     }
 
     curPlayer.buyProperty();
+    return "";
   }
 
-  public void getOutOfJail() {
+  public String getOutOfJail() {
     Player curPlayer = players[curPlayerIdx];
-    if (canRollDice && curPlayer.isInJail()) {
-      curPlayer.getOutOfJail(false);
+
+    if (!curPlayer.isInJail()) {
+      return "You are currently not in jail.";
     }
+
+    if (!canRollDice) {
+      return "You can only get out of jail at the beginning of your turn.";
+    }
+
+    curPlayer.getOutOfJail(false);
+    return "You got out of jail at your own expense.";
   }
 
-  public void endTurn() {
+  // TODO check if player is in debt
+  public String endTurn() {
     if (canRollDice) {
-      return;
+      return "You can roll the dice another time before ending your turn.";
     }
+
     canRollDice = true;
     curPlayerIdx = (curPlayerIdx + 1) % players.length;
+    return "";
   }
 
   public void transferMoneyWithEveryPlayer(int money) {

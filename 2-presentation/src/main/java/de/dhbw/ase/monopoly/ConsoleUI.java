@@ -96,19 +96,21 @@ public class ConsoleUI {
     clearConsole();
     String[] tokens = command.split(" ");
 
+    String message = "";
     if (tokens[0].equals("help")) {
       printHelp();
     } else if (tokens[0].equals("quit")) {
       System.exit(0);
     } else if (tokens[0].equals("roll")) {
-      printMessageAndWait(game.rollDice());
+      message = game.rollDice();
     } else if (tokens[0].equals("buy")) {
-      game.buyProperty();
+      message = game.buyProperty();
     } else if (tokens[0].equals("leave")) {
-      game.getOutOfJail();
+      message = game.getOutOfJail();
     } else if (tokens[0].equals("next")) {
-      game.endTurn();
+      message = game.endTurn();
     }
+    printMessageAndWait(message);
   }
 
   private String colorText(String text, Color foregroundColor) {
@@ -297,6 +299,9 @@ public class ConsoleUI {
   }
 
   private void printMessageAndWait(String message) {
+    if (message.length() == 0) {
+      return;
+    }
     clearConsole();
     System.out.println(message);
     waitForEnter();
