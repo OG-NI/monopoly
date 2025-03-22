@@ -12,4 +12,13 @@ public final class UtilService {
         .filter(message -> message != null && message.length() > 0)
         .collect(Collectors.joining("\n"));
   }
+
+  public static boolean isInteger(String s) {
+    try {
+      Integer.parseInt(s);
+      return true;
+    } catch (NumberFormatException exception) {
+      return false;
+    }
+  }
 }

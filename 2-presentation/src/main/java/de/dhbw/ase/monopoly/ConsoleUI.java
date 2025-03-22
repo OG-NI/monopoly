@@ -85,13 +85,14 @@ public class ConsoleUI {
         quit:\tleave the game
         roll:\troll the dice
         buy:\tbuy property
+        build:\tbuild house or hotel on property
         leave:\tleave jail using a card or paying the 50$ fee
-        next:\tend the turn and pass on to the next player""");
+        next:\tend the turn and pass on to the next player
+        bankruptcy\ndeclare bankruptcy and give up""");
     waitForEnter();
   }
 
   private void readAndExecuteCommand() {
-    // TODO add auction
     String command = readInput();
     clearConsole();
     String[] tokens = command.split(" ");
@@ -105,10 +106,21 @@ public class ConsoleUI {
       message = game.rollDice();
     } else if (tokens[0].equals("buy")) {
       message = game.buyProperty();
+    } else if (tokens[0].equals("build")) {
+      if (tokens.length < 2) {
+        message = "Please enter a property identifier.";
+      } else if (!UtilService.isInteger(tokens[1])) {
+        message = "Only numbers are supported as property identifiers.";
+      } else {
+        int propertyId = Integer.parseInt(tokens[1]);
+        message = game.buildOnProperty(propertyId);
+      }
     } else if (tokens[0].equals("leave")) {
       message = game.getOutOfJail();
     } else if (tokens[0].equals("next")) {
       message = game.endTurn();
+    } else if (tokens[0].equals("bankruptcy")) {
+      message = game.declareBankruptcy();
     }
     printMessageAndWait(message);
   }
@@ -190,19 +202,20 @@ public class ConsoleUI {
 
     for (int i = 0; i < propertySpaces.length; i++) {
       state[i + 1][0] = getIconForPropertySpace(propertySpaces[i]);
-      state[i + 1][1] = propertySpaces[i].getName();
-      state[i + 1][2] = getIconForBuildings(propertySpaces[i]);
+      state[i + 1][1] = String.valueOf(i);
+      state[i + 1][2] = propertySpaces[i].getName();
+      state[i + 1][3] = getIconForBuildings(propertySpaces[i]);
       Optional<Player> owner = propertySpaces[i].getOwner();
       if (owner.isPresent()) {
-        state[i + 1][3] = colorText(owner.get().getPiece(), GRAY);
+        state[i + 1][4] = colorText(owner.get().getPiece(), GRAY);
         if (propertySpaces[i] instanceof UtilitySpace) {
-          state[i + 1][4] = "";
+          state[i + 1][5] = "";
         } else {
-          state[i + 1][4] = propertySpaces[i].getRent(1) + " $";
+          state[i + 1][5] = propertySpaces[i].getRent(1) + " $";
         }
       } else {
-        state[i + 1][3] = "";
         state[i + 1][4] = "";
+        state[i + 1][5] = "";
       }
     }
     return state;
@@ -214,14 +227,22 @@ public class ConsoleUI {
     playersState[0] = new String[] { "", "Piece", "Money", "Get out of Jail Free Cards", "Position" };
 
     for (int i = 0; i < players.length; i++) {
+      // current player
       boolean isPlayerActive = game.getCurPlayerIdx() == i;
       if (isPlayerActive) {
         playersState[i + 1][0] = game.canRollDice() ? " " : " ";
       } else {
         playersState[i + 1][0] = "";
       }
+      // money
       playersState[i + 1][1] = colorText(players[i].getPiece(), GRAY);
-      playersState[i + 1][2] = String.valueOf(players[i].getMoney()) + " $";
+      int money = players[i].getMoney();
+      String moneyFormatted = money + "$";
+      if (money < 0) {
+        playersState[i + 1][2] = colorText(moneyFormatted, RED);
+      } else {
+        playersState[i + 1][2] = moneyFormatted;
+      }
       playersState[i + 1][3] = String.valueOf(players[i].getGetOutOfJailFreeCards());
       playersState[i + 1][4] = String.valueOf(players[i].getPosition());
     }
@@ -249,7 +270,7 @@ public class ConsoleUI {
     }
 
     ColoredPropertySpace coloredPropertySpace = (ColoredPropertySpace) propertySpace;
-    int numberOfHouses = coloredPropertySpace.getNumberOfHouses();
+    int numberOfHouses = coloredPropertySpace.getNumberOfBuildings();
     if (numberOfHouses <= 4) {
       return colorText(" ".repeat(numberOfHouses), GREEN);
     } else {
@@ -281,7 +302,7 @@ public class ConsoleUI {
 
   private String readInput() {
     System.out.print("==> ");
-    String input = scanner.next().strip();
+    String input = scanner.nextLine().strip();
     return input;
   }
 

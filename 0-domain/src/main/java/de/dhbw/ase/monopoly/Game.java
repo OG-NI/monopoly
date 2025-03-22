@@ -12,11 +12,12 @@ public class Game {
   private boolean canRollDice = true;
   private int consecutiveDoubles = 0;
 
-  public Game(String[] playerNames) {
+  public Game(String[] playerPieces) {
     gameBoard = new GameBoard(this);
-    players = Arrays.stream(playerNames)
-        .map(piece -> new Player(piece, gameBoard)).toArray(Player[]::new);
-    curPlayerIdx = (int) (Math.random() * playerNames.length);
+    players = Arrays.stream(playerPieces)
+        .map(piece -> new Player(piece, gameBoard))
+        .toArray(Player[]::new);
+    curPlayerIdx = (int) (Math.random() * playerPieces.length);
   }
 
   public GameBoard getGameBoard() {
@@ -103,6 +104,11 @@ public class Game {
     return "";
   }
 
+  public String buildOnProperty(int propertyId) {
+    Player curPlayer = players[curPlayerIdx];
+    return BuildingService.buildOnSpace(gameBoard, propertyId, curPlayer);
+  }
+
   public String getOutOfJail() {
     Player curPlayer = players[curPlayerIdx];
 
@@ -118,14 +124,27 @@ public class Game {
     return "You got out of jail at your own expense.";
   }
 
-  // TODO check if player is in debt
   public String endTurn() {
     if (canRollDice) {
       return "You can roll the dice another time before ending your turn.";
     }
 
+    Player curPlayer = players[curPlayerIdx];
+    if (curPlayer.getMoney() < 0) {
+      return "You have to get out of debt before ending your turn. If that is not possible, you have to declare bankruptcy and leave the game.";
+    }
+
     canRollDice = true;
     curPlayerIdx = (curPlayerIdx + 1) % players.length;
+    return "";
+  }
+
+  public String declareBankruptcy() {
+    Player curPlayer = players[curPlayerIdx];
+    if (curPlayer.getMoney() >= 0) {
+      return "You still have money left.";
+    }
+    curPlayer.makeBankrupt();
     return "";
   }
 

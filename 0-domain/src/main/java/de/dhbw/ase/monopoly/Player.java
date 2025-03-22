@@ -18,11 +18,10 @@ public class Player {
   private int position = 0;
   private int ownedRailroads = 0;
   private int ownedUtilities = 0;
-  private int ownedHouses = 0;
-  private int ownedHotels = 0;
   private int getOutOfJailFreeCards = 0;
   private int consecutiveNotDoublesInJail = 0;
   private boolean isInJail = false;
+  private boolean isBankrupt = false;
 
   public Player(String piece, GameBoard gameBoard) {
     this.piece = piece;
@@ -89,14 +88,6 @@ public class Player {
     return ownedUtilities;
   }
 
-  public int getOwnedHouses() {
-    return ownedHouses;
-  }
-
-  public int getOwnedHotels() {
-    return ownedHotels;
-  }
-
   public void buyProperty() {
     PropertySpace propertySpace = (PropertySpace) gameBoard.getSpace(position);
     transferMoney(-propertySpace.getPrice());
@@ -118,16 +109,16 @@ public class Player {
     getOutOfJailFreeCards++;
   }
 
-  public void incConsecutiveNotDoublesInJail() {
-    consecutiveNotDoublesInJail++;
-  }
-
   /**
    * @return returns true if player has not rolled doubles three times in a row
    *         while being in jail
    */
   public boolean mustGetOutOfJail() {
     return consecutiveNotDoublesInJail >= 3;
+  }
+
+  public void incConsecutiveNotDoublesInJail() {
+    consecutiveNotDoublesInJail++;
   }
 
   public boolean isInJail() {
@@ -157,5 +148,13 @@ public class Player {
         transferMoney(GET_OUT_OF_JAIL_MONEY);
       }
     }
+  }
+
+  public boolean isBankrupt() {
+    return isBankrupt;
+  }
+
+  public void makeBankrupt() {
+    isBankrupt = true;
   }
 }

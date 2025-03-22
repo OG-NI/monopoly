@@ -84,7 +84,9 @@ public class ActionCardFactory {
         },
         new ActionCard("You are assessed for street repair. $40 per house. $115 per hotel", game) {
           public String performAction(Player player) {
-            int costs = 40 * player.getOwnedHouses() + 115 * player.getOwnedHotels();
+            GameBoard gameBoard = game.getGameBoard();
+            int costs = 40 * BuildingService.getPlayerHouseCount(gameBoard, player)
+                + 115 * BuildingService.getPlayerHotelCount(gameBoard, player);
             player.transferMoney(-costs);
             return String.format("The repairs set you back %d$.", costs);
           }
@@ -166,7 +168,9 @@ public class ActionCardFactory {
         },
         new ActionCard("Make general repairs on all your property. For each house pay $25. For each hotel pay $100", game) {
           public String performAction(Player player) {
-            int costs = 25 * player.getOwnedHouses() + 100 * player.getOwnedHotels();
+            GameBoard gameBoard = game.getGameBoard();
+            int costs = 25 * BuildingService.getPlayerHouseCount(gameBoard, player)
+                + 100 * BuildingService.getPlayerHotelCount(gameBoard, player);
             player.transferMoney(-costs);
             return String.format("The repairs set you back %d$.", costs);
           }

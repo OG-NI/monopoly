@@ -4,7 +4,7 @@ public class ColoredPropertySpace extends PropertySpace {
   private final char color;
   private final int buildingPrice;
   private final int[] rents;
-  private int numberOfHouses = 0;
+  private int numberOfBuildings = 0;
 
   public ColoredPropertySpace(String name, int price, int mortgage, char color, int buildingPrice, int[] rents) {
     super(name, price, mortgage);
@@ -17,25 +17,25 @@ public class ColoredPropertySpace extends PropertySpace {
     return color;
   }
 
-  public int getNumberOfHouses() {
-    return numberOfHouses;
-  }
-
-  public void addHouse() {
-    if (numberOfHouses == 5) {
-      throw new RuntimeException("House limit exceeded.");
-    }
-
-    numberOfHouses++;
+  public int getBuildingPrice() {
+    return buildingPrice;
   }
 
   @Override
   public int getRent(int steps) {
     boolean playerOwnsWholeColor = false; // TODO check if player owns whole color group
-    if (numberOfHouses == 0 && playerOwnsWholeColor) {
+    if (numberOfBuildings == 0 && playerOwnsWholeColor) {
       return 2 * rents[0];
     }
 
-    return rents[numberOfHouses];
+    return rents[numberOfBuildings];
+  }
+
+  public int getNumberOfBuildings() {
+    return numberOfBuildings;
+  }
+
+  public void addBuilding() {
+    numberOfBuildings++;
   }
 }

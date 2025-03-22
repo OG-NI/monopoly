@@ -16,6 +16,8 @@ public class GameBoard {
   public static final int ILLINOIS_AV_POS = 24;
 
   private final BoardSpace[] boardSpaces;
+  private final PropertySpace[] propertySpaces;
+  private final ColoredPropertySpace[] coloredPropertySpaces;
 
   public GameBoard(Game game) {
     ActionCard[] communityChestCards = ActionCardFactory.initCommunityChestCards(game);
@@ -72,6 +74,14 @@ public class GameBoard {
         new TaxSpace("Luxury Tax", 100),
         new ColoredPropertySpace("Boardwalk", 400, 200, 'd', 200, new int[] { 50, 200, 600, 1400, 1700, 2000 }),
     };
+
+    propertySpaces = Arrays.stream(boardSpaces)
+        .filter(space -> space instanceof PropertySpace)
+        .toArray(PropertySpace[]::new);
+
+    coloredPropertySpaces = Arrays.stream(propertySpaces)
+        .filter(space -> space instanceof ColoredPropertySpace)
+        .toArray(ColoredPropertySpace[]::new);
   }
 
   public String enterSpace(int position, Player player, int steps) {
@@ -79,7 +89,11 @@ public class GameBoard {
   }
 
   public PropertySpace[] getPropertySpaces() {
-    return Arrays.stream(boardSpaces).filter(space -> space instanceof PropertySpace).toArray(PropertySpace[]::new);
+    return propertySpaces;
+  }
+
+  public ColoredPropertySpace[] getColoredPropertySpaces() {
+    return coloredPropertySpaces;
   }
 
   public BoardSpace getSpace(int position) {
