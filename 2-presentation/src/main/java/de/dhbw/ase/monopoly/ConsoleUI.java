@@ -21,7 +21,7 @@ public class ConsoleUI {
 
   public void start() {
     // String[] pieces = readPlayerPieces();
-    String[] pieces = new String[] { Piece.DOG.toString(), Piece.SHIP.toString() };
+    String[] pieces = new String[] { Piece.DOG.toString(), Piece.SHIP.toString(), Piece.PENGUIN.toString() };
     game = new Game(pieces);
     while (true) {
       printGameState();
@@ -32,7 +32,7 @@ public class ConsoleUI {
   private String[] readPlayerPieces() {
     String availablePieces = Arrays.stream(Piece.values())
         .map(p -> String.format("%s \"%s\"",
-            colorText(p.toString(), Color.GRAY),
+            p.toString(),
             p.name().toLowerCase()))
         .collect(Collectors.joining(", "));
     clearConsole();
@@ -87,9 +87,9 @@ public class ConsoleUI {
         buy:\tbuy property
         build:\tbuild house or hotel on property
         unbuild:\tremove house or hotel from property
-        leave:\tleave jail using a card or paying the 50$ fee
+        leave:\tleave jail using a card or paying the $50 fee
         next:\tend the turn and pass on to the next player
-        bankruptcy\ndeclare bankruptcy and give up""");
+        bankrupt\ndeclare bankruptcy and give up""");
     waitForEnter();
   }
 
@@ -123,8 +123,8 @@ public class ConsoleUI {
     } else if (tokens[0].equals("leave")) {
       message = game.getOutOfJail();
     } else if (tokens[0].equals("next")) {
-      message = game.endTurn();
-    } else if (tokens[0].equals("bankruptcy")) {
+      message = game.nextPlayer();
+    } else if (tokens[0].equals("bankrupt")) {
       message = game.declareBankruptcy();
     }
     printMessageAndWait(message);
@@ -211,11 +211,11 @@ public class ConsoleUI {
       state[i][3] = getIconForBuildings(propertySpaces[i]);
       Optional<Player> owner = propertySpaces[i].getOwner();
       if (owner.isPresent()) {
-        state[i][4] = colorText(owner.get().getPiece(), GRAY);
+        state[i][4] = owner.get().getPiece();
         if (propertySpaces[i] instanceof UtilitySpace) {
           state[i][5] = "";
         } else {
-          state[i][5] = propertySpaces[i].getRent(1) + " $";
+          state[i][5] = "$" + propertySpaces[i].getRent(1);
         }
       } else {
         state[i][4] = "";
@@ -223,8 +223,8 @@ public class ConsoleUI {
       }
     }
     String[][] splitState = splitTableVertically(state);
-    splitState[0] = new String[] { "", "Id", "Name", "Buildings", "Owner", "Rent", "", "Id", "Name", "Buildings",
-        "Owner", "Rent" };
+    splitState[0] = new String[] { "", "Id", "Name", "Buildings", "Owner", "Rent",
+        "", "Id", "Name", "Buildings", "Owner", "Rent" };
     return splitState;
   }
 
@@ -234,23 +234,42 @@ public class ConsoleUI {
     playersState[0] = new String[] { "", "Piece", "Money", "Get out of Jail Free Cards", "Position" };
 
     for (int i = 0; i < players.length; i++) {
-      // current player
+      // can roll dice, current player
       boolean isPlayerActive = game.getCurPlayerIdx() == i;
+      boolean isBankrupt = players[i].isBankrupt();
       if (isPlayerActive) {
         playersState[i + 1][0] = game.canRollDice() ? " " : " ";
+      } else if (isBankrupt) {
+        playersState[i + 1][0] = colorText("󱙖 ", GRAY);
       } else {
         playersState[i + 1][0] = "";
       }
+
+      // player piece
+      playersState[i + 1][1] = players[i].getPiece();
+
       // money
-      playersState[i + 1][1] = colorText(players[i].getPiece(), GRAY);
       int money = players[i].getMoney();
-      String moneyFormatted = money + "$";
-      if (money < 0) {
+      String moneyFormatted = "$" + money;
+      if (isBankrupt) {
+        playersState[i + 1][2] = colorText(moneyFormatted, GRAY);
+      } else if (money < 0) {
         playersState[i + 1][2] = colorText(moneyFormatted, RED);
       } else {
         playersState[i + 1][2] = moneyFormatted;
       }
-      playersState[i + 1][3] = String.valueOf(players[i].getGetOutOfJailFreeCards());
+
+      // get out of jail free cards
+      int jailCards = players[i].getGetOutOfJailFreeCards();
+      playersState[i + 1][3] = jailCards == 0 ? "" : String.valueOf(jailCards);
+
+      // bankruptcy
+      if (isBankrupt) {
+        playersState[i + 1][1] = colorText(playersState[i + 1][1], GRAY);
+        playersState[i + 1][3] = colorText(playersState[i + 1][3], GRAY);
+      }
+
+      // TODO remove when shown on game board
       playersState[i + 1][4] = String.valueOf(players[i].getPosition());
     }
     return playersState;
@@ -322,8 +341,18 @@ public class ConsoleUI {
   private String formatTableRow(String[] row, int[] maximums) {
     String s = "│";
     for (int j = 0; j < row.length; j++) {
-      int nSpaces = maximums[j] - ansiStringLength(row[j]);
-      s += row[j] + " ".repeat(nSpaces);
+      String spaces = " ".repeat(maximums[j] - ansiStringLength(row[j]));
+      if (row[j].matches("\\d.*")) {
+        // numbers alrigned right
+        s += spaces + row[j];
+      } else if (row[j].contains("$")) {
+        // spaces between dollar sign and number
+        s += row[j].replace("$", "$" + spaces);
+      } else {
+        // text aligned left
+        s += row[j] + spaces;
+      }
+      // space between columns
       if (j < row.length - 1) {
         s += " ";
       }
@@ -362,7 +391,7 @@ public class ConsoleUI {
 
   private int ansiStringLength(String s) {
     // some nerdfont characters have length 2
-    s = s.replaceAll("[󱠃󰖏󰭇󰇥󰮤󰻀󰞬]", "x");
+    s = s.replaceAll("[󱠃󰖏󰭇󰇥󰮤󰻀󰞬󱙖]", "x");
     return s.replaceAll("(\\x9B|\\x1B\\[)[0-?]*[ -\\/]*[@-~]", "").length();
   }
 }

@@ -8,8 +8,7 @@ import de.dhbw.ase.monopoly.spaces.UtilitySpace;
 
 public class Player {
   private final static int BOARD_SIZE = 40;
-  private final static int START_MONEY = 1500;
-  private final static int GET_OUT_OF_JAIL_MONEY = -50;
+  private final static int START_MONEY = 10;
 
   private final String piece;
   private final GameBoard gameBoard;
@@ -50,7 +49,7 @@ public class Player {
     if (position >= BOARD_SIZE) {
       position -= BOARD_SIZE;
       transferMoney(200);
-      passGoMessage += "You passed go and collected 200$.";
+      passGoMessage += "You passed go and collected $200.";
     }
     String spaceMessage = gameBoard.enterSpace(position, this, steps);
     return UtilService.joinMessages(passGoMessage, spaceMessage);
@@ -127,7 +126,7 @@ public class Player {
 
   /**
    * moves the player directly to jail without passing go and without receiving
-   * 200$
+   * $200
    */
   public void goToJail() {
     position = GameBoard.JAIL_POS;
@@ -145,7 +144,7 @@ public class Player {
       if (getOutOfJailFreeCards > 0) {
         getOutOfJailFreeCards--;
       } else {
-        transferMoney(GET_OUT_OF_JAIL_MONEY);
+        transferMoney(-50);
       }
     }
   }

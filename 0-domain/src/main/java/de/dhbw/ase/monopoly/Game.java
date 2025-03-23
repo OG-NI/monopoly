@@ -1,6 +1,7 @@
 package de.dhbw.ase.monopoly;
 
 import java.util.Arrays;
+import java.util.List;
 
 import de.dhbw.ase.monopoly.spaces.BoardSpace;
 import de.dhbw.ase.monopoly.spaces.PropertySpace;
@@ -125,11 +126,15 @@ public class Game {
       return "You can only get out of jail at the beginning of your turn.";
     }
 
+    if (curPlayer.getMoney() < 50 && curPlayer.getGetOutOfJailFreeCards() == 0) {
+      return "You need at least $50 or a card to get out of jail.";
+    }
+
     curPlayer.getOutOfJail(false);
     return "You got out of jail at your own expense.";
   }
 
-  public String endTurn() {
+  public String nextPlayer() {
     if (canRollDice) {
       return "You can roll the dice another time before ending your turn.";
     }
@@ -139,8 +144,7 @@ public class Game {
       return "You have to get out of debt before ending your turn. If that is not possible, you have to declare bankruptcy and leave the game.";
     }
 
-    canRollDice = true;
-    curPlayerIdx = (curPlayerIdx + 1) % players.length;
+    endTurn();
     return "";
   }
 
@@ -149,17 +153,36 @@ public class Game {
     if (curPlayer.getMoney() >= 0) {
       return "You still have money left.";
     }
+    if (canRollDice) {
+      return "You can roll the dice another time.";
+    }
     curPlayer.makeBankrupt();
+    // TODO check if single player is left and has won
+    endTurn();
     return "";
   }
 
+  /**
+   * transfer the specified sum of money from every other player in the game to
+   * the current player
+   */
   public void transferMoneyWithEveryPlayer(int money) {
-    Arrays.stream(players).forEach(p -> p.transferMoney(-money));
-    int totalMoney = money * players.length;
+    List<Player> activePlayers = Arrays.stream(players)
+        .filter(player -> !player.isBankrupt())
+        .toList();
+    activePlayers.forEach(p -> p.transferMoney(-money));
+    int totalMoney = money * activePlayers.size();
     players[curPlayerIdx].transferMoney(totalMoney);
   }
 
   private int randomDice() {
     return (int) (Math.random() * 5 + 1);
+  }
+
+  private void endTurn() {
+    do {
+      curPlayerIdx = (curPlayerIdx + 1) % players.length;
+    } while (players[curPlayerIdx].isBankrupt());
+    canRollDice = true;
   }
 }

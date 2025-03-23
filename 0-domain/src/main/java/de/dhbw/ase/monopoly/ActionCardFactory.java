@@ -88,7 +88,7 @@ public class ActionCardFactory {
             int costs = 40 * BuildingService.getPlayerHouseCount(gameBoard, player)
                 + 115 * BuildingService.getPlayerHotelCount(gameBoard, player);
             player.transferMoney(-costs);
-            return String.format("The repairs set you back %d$.", costs);
+            return String.format("The repairs set you back $%d.", costs);
           }
         },
         new ActionCard("You have won second prize in a beauty contest. Collect $10", game) {
@@ -172,7 +172,7 @@ public class ActionCardFactory {
             int costs = 25 * BuildingService.getPlayerHouseCount(gameBoard, player)
                 + 100 * BuildingService.getPlayerHotelCount(gameBoard, player);
             player.transferMoney(-costs);
-            return String.format("The repairs set you back %d$.", costs);
+            return String.format("The repairs set you back $%d.", costs);
           }
         },
         new ActionCard("Speeding fine $15", game) {
