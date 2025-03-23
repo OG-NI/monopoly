@@ -73,8 +73,8 @@ public class ConsoleUI {
     // TODO show tables next to each other
     clearConsole();
     System.out.println(String.join("\n", getBoard()));
-    printTable(getPlayersState());
-    printTable(getPropertySpacesState());
+    System.out.println(formatTable(getPlayersState()));
+    System.out.println(formatTable(getPropertySpacesState()));
   }
 
   private void printHelp() {
@@ -197,28 +197,30 @@ public class ConsoleUI {
 
   private String[][] getPropertySpacesState() {
     PropertySpace[] propertySpaces = game.getGameBoard().getPropertySpaces();
-    String[][] state = new String[propertySpaces.length + 1][5];
-    state[0] = new String[] { "", "Name", "Buildings", "Owner", "Rent" };
+    String[][] state = new String[propertySpaces.length][6];
 
     for (int i = 0; i < propertySpaces.length; i++) {
-      state[i + 1][0] = getIconForPropertySpace(propertySpaces[i]);
-      state[i + 1][1] = String.valueOf(i);
-      state[i + 1][2] = propertySpaces[i].getName();
-      state[i + 1][3] = getIconForBuildings(propertySpaces[i]);
+      state[i][0] = getIconForPropertySpace(propertySpaces[i]);
+      state[i][1] = String.valueOf(i);
+      state[i][2] = propertySpaces[i].getName();
+      state[i][3] = getIconForBuildings(propertySpaces[i]);
       Optional<Player> owner = propertySpaces[i].getOwner();
       if (owner.isPresent()) {
-        state[i + 1][4] = colorText(owner.get().getPiece(), GRAY);
+        state[i][4] = colorText(owner.get().getPiece(), GRAY);
         if (propertySpaces[i] instanceof UtilitySpace) {
-          state[i + 1][5] = "";
+          state[i][5] = "";
         } else {
-          state[i + 1][5] = propertySpaces[i].getRent(1) + " $";
+          state[i][5] = propertySpaces[i].getRent(1) + " $";
         }
       } else {
-        state[i + 1][4] = "";
-        state[i + 1][5] = "";
+        state[i][4] = "";
+        state[i][5] = "";
       }
     }
-    return state;
+    String[][] splitState = splitTableVertically(state);
+    splitState[0] = new String[] { "", "Id", "Name", "Buildings", "Owner", "Rent", "", "Id", "Name", "Buildings",
+        "Owner", "Rent" };
+    return splitState;
   }
 
   private String[][] getPlayersState() {
@@ -278,8 +280,21 @@ public class ConsoleUI {
     }
   }
 
-  private void printTable(String[][] data) {
+  private String[][] splitTableVertically(String[][] data) {
+    int halfHeight = data.length / 2;
+    int width = data[0].length;
+    String[][] newData = new String[halfHeight + 1][width * 2];
+    for (int i = 0; i < halfHeight; i++) {
+      System.arraycopy(data[i], 0, newData[i + 1], 0, width);
+      System.arraycopy(data[halfHeight + i], 0, newData[i + 1], width, width);
+    }
+    return newData;
+  }
+
+  private String formatTable(String[][] data) {
     int nColumns = data[0].length;
+
+    // maximum width for each column
     int[] maximums = new int[nColumns];
     for (int j = 0; j < nColumns; j++) {
       final int k = j;
@@ -287,17 +302,29 @@ public class ConsoleUI {
           .mapToInt(row -> ansiStringLength(row[k]))
           .max().orElseThrow();
     }
+    String horizontalLine = "─".repeat(Arrays.stream(maximums).sum() + nColumns - 1);
 
-    String s = "";
-    for (String[] row : data) {
-      for (int j = 0; j < nColumns; j++) {
-        int nSpaces = maximums[j] - ansiStringLength(row[j]) + 1;
-        s += row[j] + " ".repeat(nSpaces);
-      }
-      s += "\n";
+    String s = "┌" + horizontalLine + "┐\n";
+    s += formatTableRow(data[0], maximums);
+    s += "├" + horizontalLine + "┤\n";
+    for (int i = 1; i < data.length; i++) {
+      s += formatTableRow(data[i], maximums);
     }
+    s += "└" + horizontalLine + "┘";
+    return s;
+  }
 
-    System.out.println(s);
+  private String formatTableRow(String[] row, int[] maximums) {
+    String s = "│";
+    for (int j = 0; j < row.length; j++) {
+      int nSpaces = maximums[j] - ansiStringLength(row[j]);
+      s += row[j] + " ".repeat(nSpaces);
+      if (j < row.length - 1) {
+        s += " ";
+      }
+    }
+    s += "│\n";
+    return s;
   }
 
   private String readInput() {
