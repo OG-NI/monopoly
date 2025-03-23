@@ -6,12 +6,14 @@ import de.dhbw.ase.monopoly.*;
 public abstract class PropertySpace extends BoardSpace {
   protected final int price;
   protected final int mortgage;
+  protected final GameBoard gameBoard;
   protected Optional<Player> owner = Optional.empty();
 
-  public PropertySpace(String name, int price, int mortgage) {
+  public PropertySpace(String name, int price, int mortgage, GameBoard gameBoard) {
     super(name);
     this.price = price;
     this.mortgage = mortgage;
+    this.gameBoard = gameBoard;
   }
 
   public int getPrice() {

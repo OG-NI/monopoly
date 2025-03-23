@@ -3,7 +3,6 @@ package de.dhbw.ase.monopoly;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import de.dhbw.ase.monopoly.spaces.ColoredPropertySpace;
 import de.dhbw.ase.monopoly.spaces.PropertySpace;
@@ -130,6 +129,20 @@ public class BuildingService {
         .filter(space -> space.getOwner().isPresent() &&
             space.getOwner().get() == player &&
             space.getNumberOfBuildings() == 5)
+        .count();
+  }
+
+  public static int getPlayerRailroadCount(GameBoard gameBoard, Player player) {
+    return (int) Arrays.stream(gameBoard.getRailroadSpaces())
+        .filter(space -> space.getOwner().isPresent() &&
+            space.getOwner().get() == player)
+        .count();
+  }
+
+  public static int getPlayerUtilityCount(GameBoard gameBoard, Player player) {
+    return (int) Arrays.stream(gameBoard.getUtilitySpaces())
+        .filter(space -> space.getOwner().isPresent() &&
+            space.getOwner().get() == player)
         .count();
   }
 

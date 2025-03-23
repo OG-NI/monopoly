@@ -3,20 +3,16 @@ package de.dhbw.ase.monopoly;
 import java.util.Optional;
 
 import de.dhbw.ase.monopoly.spaces.PropertySpace;
-import de.dhbw.ase.monopoly.spaces.RailroadSpace;
-import de.dhbw.ase.monopoly.spaces.UtilitySpace;
 
 public class Player {
   private final static int BOARD_SIZE = 40;
-  private final static int START_MONEY = 10;
+  private final static int START_MONEY = 1500;
 
   private final String piece;
   private final GameBoard gameBoard;
 
   private int money = START_MONEY;
   private int position = 0;
-  private int ownedRailroads = 0;
-  private int ownedUtilities = 0;
   private int getOutOfJailFreeCards = 0;
   private int consecutiveNotDoublesInJail = 0;
   private boolean isInJail = false;
@@ -79,25 +75,10 @@ public class Player {
     return moveToPosition(utilityPos);
   }
 
-  public int getOwnedRailroads() {
-    return ownedRailroads;
-  }
-
-  public int getOwnedUtilities() {
-    return ownedUtilities;
-  }
-
   public void buyProperty() {
     PropertySpace propertySpace = (PropertySpace) gameBoard.getSpace(position);
     transferMoney(-propertySpace.getPrice());
     propertySpace.setOwner(Optional.of(this));
-
-    if (propertySpace instanceof RailroadSpace) {
-      ownedRailroads++;
-    }
-    if (propertySpace instanceof UtilitySpace) {
-      ownedUtilities++;
-    }
   }
 
   public int getGetOutOfJailFreeCards() {
