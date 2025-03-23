@@ -109,6 +109,11 @@ public class Game {
     return BuildingService.buildOnSpace(gameBoard, propertyId, curPlayer);
   }
 
+  public String unbuildOnProperty(int propertyId) {
+    Player curPlayer = players[curPlayerIdx];
+    return BuildingService.unbuildOnSpace(gameBoard, propertyId, curPlayer);
+  }
+
   public String getOutOfJail() {
     Player curPlayer = players[curPlayerIdx];
 

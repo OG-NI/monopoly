@@ -38,4 +38,8 @@ public class ColoredPropertySpace extends PropertySpace {
   public void addBuilding() {
     numberOfBuildings++;
   }
+
+  public void removeBuilding() {
+    numberOfBuildings--;
+  }
 }

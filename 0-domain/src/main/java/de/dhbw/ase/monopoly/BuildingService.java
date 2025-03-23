@@ -55,12 +55,54 @@ public class BuildingService {
     }
 
     // color group not built evenly
-    if (!isColorGroupEvenlyBuilt(gameBoard, color, numberOfBuildings)) {
+    int minNumberOfBuildings = getNumbersOfBuildings(gameBoard, color).min().orElseThrow();
+    if (minNumberOfBuildings < numberOfBuildings) {
       return "Houses and hotels must be built evenly across all properties of the same color group.";
     }
 
     coloredPropertySpace.addBuilding();
     player.transferMoney(-buildingPrice);
+    return "";
+  }
+
+  public static String unbuildOnSpace(GameBoard gameBoard, int propertyId, Player player) {
+    PropertySpace[] propertySpaces = gameBoard.getPropertySpaces();
+    int maxPropertyId = propertySpaces.length - 1;
+
+    // id out of range
+    if (propertyId < 0 || propertyId > maxPropertyId) {
+      return String.format("The property identifier must be between 0 and %d.", maxPropertyId);
+    }
+    PropertySpace propertySpace = propertySpaces[propertyId];
+
+    // property does not belong to a color group
+    if (!(propertySpace instanceof ColoredPropertySpace)) {
+      return "You can not build on railroads and utility spaces.";
+    }
+    ColoredPropertySpace coloredPropertySpace = (ColoredPropertySpace) propertySpace;
+    Optional<Player> owner = coloredPropertySpace.getOwner();
+
+    // player is not the owner
+    if (owner.isEmpty() || owner.get() != player) {
+      return "You can only build on your own property.";
+    }
+
+    // property does not have a building
+    int numberOfBuildings = coloredPropertySpace.getNumberOfBuildings();
+    if (numberOfBuildings == 0) {
+      return "Property does not have a house or hotel to unbuild.";
+    }
+
+    // color group not unbuilt evenly
+    char color = coloredPropertySpace.getColor();
+    int maxNumberOfBuildings = getNumbersOfBuildings(gameBoard, color).max().orElseThrow();
+    if (maxNumberOfBuildings > numberOfBuildings) {
+      return "Houses and hotels must be built evenly across all properties of the same color group.";
+    }
+
+    int buildingPrice = coloredPropertySpace.getBuildingPrice();
+    coloredPropertySpace.removeBuilding();
+    player.transferMoney(buildingPrice / 2);
     return "";
   }
 
@@ -92,14 +134,12 @@ public class BuildingService {
   }
 
   /**
-   * returns true if all properties of the given color group have at least
-   * the given number of buildings
+   * get numbers of buildings on all properties in a color group
    */
-  private static boolean isColorGroupEvenlyBuilt(GameBoard gameBoard, char color, int minNumberOfBuildings) {
+  private static IntStream getNumbersOfBuildings(GameBoard gameBoard, char color) {
     ColoredPropertySpace[] coloredPropertySpaces = gameBoard.getColoredPropertySpaces();
-    boolean existsPropertyBelowMinimumNumberOfHouses = Arrays.stream(coloredPropertySpaces)
-        .anyMatch(space -> space.getColor() == color &&
-            space.getNumberOfBuildings() < minNumberOfBuildings);
-    return !existsPropertyBelowMinimumNumberOfHouses;
+    return Arrays.stream(coloredPropertySpaces)
+        .filter(space -> space.getColor() == color)
+        .mapToInt(space -> space.getNumberOfBuildings());
   }
 }

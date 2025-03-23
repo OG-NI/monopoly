@@ -86,6 +86,7 @@ public class ConsoleUI {
         roll:\troll the dice
         buy:\tbuy property
         build:\tbuild house or hotel on property
+        unbuild:\tremove house or hotel from property
         leave:\tleave jail using a card or paying the 50$ fee
         next:\tend the turn and pass on to the next player
         bankruptcy\ndeclare bankruptcy and give up""");
@@ -106,14 +107,18 @@ public class ConsoleUI {
       message = game.rollDice();
     } else if (tokens[0].equals("buy")) {
       message = game.buyProperty();
-    } else if (tokens[0].equals("build")) {
+    } else if (List.of("build", "unbuild").contains(tokens[0])) {
       if (tokens.length < 2) {
         message = "Please enter a property identifier.";
       } else if (!UtilService.isInteger(tokens[1])) {
         message = "Only numbers are supported as property identifiers.";
       } else {
         int propertyId = Integer.parseInt(tokens[1]);
-        message = game.buildOnProperty(propertyId);
+        if (tokens[0].equals("build")) {
+          message = game.buildOnProperty(propertyId);
+        } else {
+          message = game.unbuildOnProperty(propertyId);
+        }
       }
     } else if (tokens[0].equals("leave")) {
       message = game.getOutOfJail();
