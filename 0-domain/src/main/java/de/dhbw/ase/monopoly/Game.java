@@ -156,10 +156,10 @@ public class Game {
     if (canRollDice) {
       return "You can roll the dice another time.";
     }
+
     curPlayer.makeBankrupt();
-    // TODO check if single player is left and has won
     endTurn();
-    return "";
+    return checkIfSinglePlayerIsLeft();
   }
 
   /**
@@ -184,5 +184,17 @@ public class Game {
       curPlayerIdx = (curPlayerIdx + 1) % players.length;
     } while (players[curPlayerIdx].isBankrupt());
     canRollDice = true;
+  }
+
+  private String checkIfSinglePlayerIsLeft() {
+    long numberOfActivePlayers = Arrays.stream(players)
+        .filter(player -> !player.isBankrupt())
+        .count();
+    if (numberOfActivePlayers == 1) {
+      String piece = players[curPlayerIdx].getPiece();
+      return String.format("Player %s has won the game.", piece);
+    } else {
+      return "";
+    }
   }
 }

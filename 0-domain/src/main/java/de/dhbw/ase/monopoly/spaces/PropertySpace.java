@@ -24,6 +24,10 @@ public abstract class PropertySpace extends BoardSpace {
     return owner;
   }
 
+  public boolean isOwnedBy(Player player) {
+    return owner.isPresent() && owner.get() == player;
+  }
+
   public void setOwner(Optional<Player> owner) {
     this.owner = owner;
   }

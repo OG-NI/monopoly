@@ -21,7 +21,7 @@ public class ConsoleUI {
 
   public void start() {
     // String[] pieces = readPlayerPieces();
-    String[] pieces = new String[] { Piece.DOG.toString(), Piece.SHIP.toString(), Piece.PENGUIN.toString() };
+    String[] pieces = new String[] { Piece.DOG.toString(), Piece.SHIP.toString() };
     game = new Game(pieces);
     while (true) {
       printGameState();
@@ -81,15 +81,15 @@ public class ConsoleUI {
     System.out.println("""
         Help for Available Commands:
 
-        help:\tdisplay this help page
-        quit:\tleave the game
-        roll:\troll the dice
-        buy:\tbuy property
-        build:\tbuild house or hotel on property
+        help:\t\tdisplay this help page
+        quit:\t\tleave the game
+        roll:\t\troll the dice
+        buy:\t\tbuy property
+        build:\t\tbuild house or hotel on property
         unbuild:\tremove house or hotel from property
-        leave:\tleave jail using a card or paying the $50 fee
-        next:\tend the turn and pass on to the next player
-        bankrupt\ndeclare bankruptcy and give up""");
+        leave:\t\tleave jail using a card or paying the $50 fee
+        next:\t\tend the turn and pass on to the next player
+        bankrupt:\tdeclare bankruptcy and give up""");
     waitForEnter();
   }
 

@@ -28,10 +28,9 @@ public class BuildingService {
       return "You can not build on railroads and utility spaces.";
     }
     ColoredPropertySpace coloredPropertySpace = (ColoredPropertySpace) propertySpace;
-    Optional<Player> owner = coloredPropertySpace.getOwner();
 
     // player is not the owner
-    if (owner.isEmpty() || owner.get() != player) {
+    if (!coloredPropertySpace.isOwnedBy(player)) {
       return "You can only build on your own property.";
     }
 
@@ -79,10 +78,9 @@ public class BuildingService {
       return "You can not build on railroads and utility spaces.";
     }
     ColoredPropertySpace coloredPropertySpace = (ColoredPropertySpace) propertySpace;
-    Optional<Player> owner = coloredPropertySpace.getOwner();
 
     // player is not the owner
-    if (owner.isEmpty() || owner.get() != player) {
+    if (!coloredPropertySpace.isOwnedBy(player)) {
       return "You can only build on your own property.";
     }
 
@@ -105,49 +103,63 @@ public class BuildingService {
     return "";
   }
 
+  public static void disownPlayerOfAllProperties(GameBoard gameBoard, Player player) {
+    // TODO auction properties or give to player who is responsible for bankrupting
+    // remove owner status
+    Arrays.stream(gameBoard.getPropertySpaces())
+        .filter(space -> space.isOwnedBy(player))
+        .forEach(space -> space.setOwner(Optional.empty()));
+
+    // TODO sell buildings and give money to player responsible for bankrupting
+    // remove remaining buildings
+    Arrays.stream(gameBoard.getColoredPropertySpaces())
+        .filter(space -> space.isOwnedBy(player))
+        .forEach(space -> {
+          while (space.getNumberOfBuildings() > 0) {
+            space.removeBuilding();
+          }
+        });
+  }
+
   public static boolean playerOwnsWholeColorGroup(GameBoard gameBoard, char color, Player player) {
     ColoredPropertySpace[] coloredPropertySpaces = gameBoard.getColoredPropertySpaces();
     boolean existsPropertyNotOwnedByPlayer = Arrays.stream(coloredPropertySpaces)
-        .anyMatch(space -> space.getColor() == color &&
-            (!space.getOwner().isPresent() || space.getOwner().get() != player));
+        .anyMatch(space -> space.isOwnedBy(player) &&
+            space.getColor() == color);
     return !existsPropertyNotOwnedByPlayer;
   }
 
   public static int getPlayerHouseCount(GameBoard gameBoard, Player player) {
     ColoredPropertySpace[] coloredPropertySpaces = gameBoard.getColoredPropertySpaces();
     return Arrays.stream(coloredPropertySpaces)
-        .filter(space -> space.getOwner().isPresent() &&
-            space.getOwner().get() == player &&
-            space.getNumberOfBuildings() <= 4)
-        .mapToInt(space -> space.getNumberOfBuildings())
+        .filter(space -> space.isOwnedBy(player))
+        .mapToInt(ColoredPropertySpace::getNumberOfBuildings)
         .sum();
   }
 
   public static int getPlayerHotelCount(GameBoard gameBoard, Player player) {
     ColoredPropertySpace[] coloredPropertySpaces = gameBoard.getColoredPropertySpaces();
     return (int) Arrays.stream(coloredPropertySpaces)
-        .filter(space -> space.getOwner().isPresent() &&
-            space.getOwner().get() == player &&
+        .filter(space -> space.isOwnedBy(player) &&
             space.getNumberOfBuildings() == 5)
         .count();
   }
 
   public static int getPlayerRailroadCount(GameBoard gameBoard, Player player) {
     return (int) Arrays.stream(gameBoard.getRailroadSpaces())
-        .filter(space -> space.getOwner().isPresent() &&
-            space.getOwner().get() == player)
+        .filter(space -> space.isOwnedBy(player))
         .count();
   }
 
   public static int getPlayerUtilityCount(GameBoard gameBoard, Player player) {
     return (int) Arrays.stream(gameBoard.getUtilitySpaces())
-        .filter(space -> space.getOwner().isPresent() &&
-            space.getOwner().get() == player)
+        .filter(space -> space.isOwnedBy(player))
         .count();
   }
 
   /**
    * get numbers of buildings on all properties in a color group
+   * this is used to check if houses and hotels are built evenly
    */
   private static IntStream getNumbersOfBuildings(GameBoard gameBoard, char color) {
     ColoredPropertySpace[] coloredPropertySpaces = gameBoard.getColoredPropertySpaces();
