@@ -87,8 +87,8 @@ public class ConsoleUI {
         quit:\t\tleave the game
         roll:\t\troll the dice
         buy:\t\tbuy property
-        build:\t\tbuild house or hotel on property
-        unbuild:\tremove house or hotel from property
+        build <id>:\tbuild house or hotel on property
+        unbuild <id>:\tremove house or hotel from property
         leave:\t\tleave jail using a card or paying the $50 fee
         next:\t\tend the turn and pass on to the next player
         bankrupt:\tdeclare bankruptcy and give up""");
