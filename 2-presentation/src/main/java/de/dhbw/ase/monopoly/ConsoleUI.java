@@ -161,7 +161,7 @@ public class ConsoleUI {
   private String[][] getPlayersState() {
     Player[] players = game.getPlayers();
     String[][] playersState = new String[players.length + 1][4];
-    playersState[0] = new String[] { "", "Piece", "Money", "Get out of Jail Free Cards" };
+    playersState[0] = new String[] { "", "Player", "Money", "Get out of Jail Free Cards" };
 
     for (int i = 0; i < players.length; i++) {
       // can roll dice, current player
@@ -175,8 +175,17 @@ public class ConsoleUI {
         playersState[i + 1][0] = "";
       }
 
-      // player piece
+      // player piece, is player in jail
       playersState[i + 1][1] = players[i].getPiece();
+      if (players[i].isInJail()) {
+        if (players[i].isBankrupt()) {
+          playersState[i + 1][1] += ConsoleFormatter.colorText(" 󱨮 ", GRAY);
+        } else {
+          playersState[i + 1][1] += ConsoleFormatter.colorText(" 󱨮 ", BLACK, ORANGE);
+        }
+      } else {
+        playersState[i + 1][1] += "   ";
+      }
 
       // money
       int money = players[i].getMoney();

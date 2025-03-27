@@ -21,7 +21,7 @@ public final class ConsoleFormatter {
    */
   public static int ansiStringLength(String s) {
     // some nerd fonts characters have length 2
-    s = s.replaceAll("[󱠃󰖏󰭇󰇥󰮤󰻀󰞬󱙖]", "x");
+    s = s.replaceAll("[󱠃󰖏󰭇󰇥󰮤󰻀󰞬󱙖󱨮]", "x");
     return s.replaceAll("(\\x9B|\\x1B\\[)[0-?]*[ -\\/]*[@-~]", "").length();
   }
 
