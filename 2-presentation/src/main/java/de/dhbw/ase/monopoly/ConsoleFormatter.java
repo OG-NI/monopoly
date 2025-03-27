@@ -8,32 +8,82 @@ public final class ConsoleFormatter {
   private ConsoleFormatter() {
   }
 
-  public static String colorText(String text, Color foregroundColor) {
-    return String.format("\u001B[38;2;%sm%s\u001B[0m", foregroundColor, text);
+  public static String colorText(String text, Color textColor) {
+    return String.format("\u001B[38;2;%sm%s\u001B[0m", textColor, text);
   }
 
-  public static String colorText(String text, Color foregroundColor, Color backgroundColor) {
-    return String.format("\u001B[38;2;%sm\u001B[48;2;%sm%s\u001B[0m", foregroundColor, backgroundColor, text);
+  public static String colorText(String text, Color textColor, Color backgroundColor) {
+    return String.format("\u001B[38;2;%sm\u001B[48;2;%sm%s\u001B[0m", textColor, backgroundColor, text);
   }
 
+  /**
+   * calculates the length of a {@code String} ignoring ANSI escape characters
+   */
   public static int ansiStringLength(String s) {
     // some nerd fonts characters have length 2
     s = s.replaceAll("[󱠃󰖏󰭇󰇥󰮤󰻀󰞬󱙖]", "x");
     return s.replaceAll("(\\x9B|\\x1B\\[)[0-?]*[ -\\/]*[@-~]", "").length();
   }
 
-  public static String[][] splitTableVertically(String[][] data) {
-    int halfHeight = data.length / 2;
-    int width = data[0].length;
-    String[][] newData = new String[halfHeight + 1][width * 2];
-    for (int i = 0; i < halfHeight; i++) {
-      System.arraycopy(data[i], 0, newData[i + 1], 0, width);
-      System.arraycopy(data[halfHeight + i], 0, newData[i + 1], width, width);
+  public static String[] joinTablesVertically(String[] table1, String[] table2) {
+    String[] smallerTable;
+    if (table1[0].length() > table2[0].length()) {
+      smallerTable = table2;
+    } else {
+      smallerTable = table1;
     }
-    return newData;
+
+    // horizontal padding to center smaller table relative to larger table
+    int widthDifference = Math.abs(table1[0].length() - table2[0].length());
+    String spacesBefore = " ".repeat((int) Math.floor(widthDifference / 2d));
+    String spacesAfter = " ".repeat((int) Math.ceil(widthDifference / 2d));
+    for (int i = 0; i < smallerTable.length; i++) {
+      smallerTable[i] = spacesBefore + smallerTable[i] + spacesAfter;
+    }
+
+    // join tables to new table
+    String[] table = new String[table1.length + table2.length];
+    System.arraycopy(table1, 0, table, 0, table1.length);
+    System.arraycopy(table2, 0, table, table1.length, table2.length);
+    return table;
   }
 
-  public static String formatTable(String[][] data) {
+  public static String[] joinTablesHorizontally(String[] table1, String[] table2) {
+    // identify smaller table
+    String[] smallerTable;
+    int largerTableLength;
+    if (table1.length > table2.length) {
+      smallerTable = table2;
+      largerTableLength = table1.length;
+    } else {
+      smallerTable = table1;
+      largerTableLength = table2.length;
+    }
+
+    // vertical padding to center smaller table relative to larger table
+    int heightDifference = Math.abs(table1.length - table2.length);
+    int emptyLinesBefore = (int) Math.floor(heightDifference / 2d);
+    String[] paddedSmallerTable = new String[largerTableLength];
+    String spaces = " ".repeat(smallerTable[0].length());
+    Arrays.fill(paddedSmallerTable, spaces);
+    System.arraycopy(smallerTable, 0, paddedSmallerTable, emptyLinesBefore, smallerTable.length);
+
+    // change reference to smaller table with padding
+    if (table1.length > table2.length) {
+      table2 = paddedSmallerTable;
+    } else {
+      table1 = paddedSmallerTable;
+    }
+
+    // join tables to new table
+    String[] table = table1.clone();
+    for (int i = 0; i < table.length; i++) {
+      table[i] += table2[i];
+    }
+    return table;
+  }
+
+  public static String[] formatTable(String[][] data) {
     int nColumns = data[0].length;
 
     // maximum width for each column
@@ -46,14 +96,15 @@ public final class ConsoleFormatter {
     }
     String horizontalLine = "─".repeat(Arrays.stream(maximums).sum() + nColumns - 1);
 
-    String s = "┌" + horizontalLine + "┐\n";
-    s += formatTableRow(data[0], maximums);
-    s += "├" + horizontalLine + "┤\n";
+    String[] table = new String[data.length + 3];
+    table[0] = "┌" + horizontalLine + "┐";
+    table[1] = formatTableRow(data[0], maximums);
+    table[2] = "├" + horizontalLine + "┤";
     for (int i = 1; i < data.length; i++) {
-      s += formatTableRow(data[i], maximums);
+      table[i + 2] = formatTableRow(data[i], maximums);
     }
-    s += "└" + horizontalLine + "┘";
-    return s;
+    table[table.length - 1] = "└" + horizontalLine + "┘";
+    return table;
   }
 
   private static String formatTableRow(String[] row, int[] maximums) {
@@ -75,7 +126,7 @@ public final class ConsoleFormatter {
         s += " ";
       }
     }
-    s += "│\n";
+    s += "│";
     return s;
   }
 }
