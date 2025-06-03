@@ -10,6 +10,7 @@ public class Player {
 
   private final String piece;
   private final GameBoard gameBoard;
+  private final EventReceiver eventReceiver;
 
   private int money = START_MONEY;
   private int position = 0;
@@ -18,9 +19,10 @@ public class Player {
   private boolean isInJail = false;
   private boolean isBankrupt = false;
 
-  public Player(String piece, GameBoard gameBoard) {
+  public Player(String piece, GameBoard gameBoard, EventReceiver eventReceiver) {
     this.piece = piece;
     this.gameBoard = gameBoard;
+    this.eventReceiver = eventReceiver;
   }
 
   public String getPiece() {
@@ -39,40 +41,38 @@ public class Player {
     return position;
   }
 
-  public String moveForward(int steps) {
-    String passGoMessage = "";
+  public void moveForward(int steps) {
     position += steps;
     if (position >= BOARD_SIZE) {
+      eventReceiver.addEvent("You passed go and collected $200.");
       position -= BOARD_SIZE;
       transferMoney(200);
-      passGoMessage += "You passed go and collected $200.";
     }
-    String spaceMessage = gameBoard.enterSpace(position, this, steps);
-    return UtilService.joinMessages(passGoMessage, spaceMessage);
+    gameBoard.enterSpace(position, this, steps);
   }
 
-  public String moveToPosition(int position) {
+  public void moveToPosition(int position) {
     if (position > this.position) {
-      return moveForward(position - this.position);
+      moveForward(position - this.position);
     } else {
-      return moveForward(BOARD_SIZE + position - this.position);
+      moveForward(BOARD_SIZE + position - this.position);
     }
   }
 
-  public String moveToNearestRailroad() {
+  public void moveToNearestRailroad() {
     int shiftedPos = (position + 5) % BOARD_SIZE;
     int railroadIdx = shiftedPos / 10;
     int railroadPos = railroadIdx * 10 + 5;
     // TODO pay twice the rent
-    return moveToPosition(railroadPos);
+    moveToPosition(railroadPos);
   }
 
-  public String moveToNearestUtility() {
+  public void moveToNearestUtility() {
     int shiftedPos = (position + 12) % BOARD_SIZE;
     int utilityIdx = shiftedPos / 24;
     int utilityPos = utilityIdx * 16 + 12;
     // TODO throw dice and pay owner ten times amount thrown
-    return moveToPosition(utilityPos);
+    moveToPosition(utilityPos);
   }
 
   public void buyProperty() {

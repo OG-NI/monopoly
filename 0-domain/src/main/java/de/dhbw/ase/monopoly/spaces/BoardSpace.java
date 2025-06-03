@@ -4,9 +4,11 @@ import de.dhbw.ase.monopoly.*;
 
 public abstract class BoardSpace {
   protected final String name;
+  protected final EventReceiver eventReceiver;
 
-  protected BoardSpace(String name) {
+  protected BoardSpace(String name, EventReceiver eventReceiver) {
     this.name = name;
+    this.eventReceiver = eventReceiver;
   }
 
   public String getName() {
@@ -17,5 +19,5 @@ public abstract class BoardSpace {
     return false;
   }
 
-  public abstract String enterSpace(Player player, int steps);
+  public abstract void enterSpace(Player player, int steps);
 }

@@ -1,7 +1,6 @@
 package de.dhbw.ase.monopoly.spaces;
 
-import de.dhbw.ase.monopoly.BuildingService;
-import de.dhbw.ase.monopoly.GameBoard;
+import de.dhbw.ase.monopoly.*;
 
 public class ColoredPropertySpace extends PropertySpace {
   private final char color;
@@ -10,8 +9,8 @@ public class ColoredPropertySpace extends PropertySpace {
   private int numberOfBuildings = 0;
 
   public ColoredPropertySpace(String name, int price, int mortgage, GameBoard gameBoard,
-      char color, int buildingPrice, int[] rents) {
-    super(name, price, mortgage, gameBoard);
+      char color, int buildingPrice, int[] rents, EventReceiver eventReceiver) {
+    super(name, price, mortgage, gameBoard, eventReceiver);
     this.color = color;
     this.buildingPrice = buildingPrice;
     this.rents = rents;

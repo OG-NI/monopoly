@@ -13,94 +13,94 @@ public class BuildingService {
    * 
    * @param propertyId index on the game board just including property spaces
    */
-  public static String buildOnSpace(GameBoard gameBoard, int propertyId, Player player) {
+  public static String buildOnSpace(GameBoard gameBoard, int propertyId, Player player) throws InvalidMoveException {
     PropertySpace[] propertySpaces = gameBoard.getPropertySpaces();
     int maxPropertyId = propertySpaces.length - 1;
 
     // id out of range
     if (propertyId < 0 || propertyId > maxPropertyId) {
-      return String.format("The property identifier must be between 0 and %d.", maxPropertyId);
+      throw new InvalidMoveException(String.format("The property identifier must be between 0 and %d.", maxPropertyId));
     }
     PropertySpace propertySpace = propertySpaces[propertyId];
 
     // property does not belong to a color group
     if (!(propertySpace instanceof ColoredPropertySpace)) {
-      return "You can not build on railroads and utility spaces.";
+      throw new InvalidMoveException("You can not build on railroads and utility spaces.");
     }
     ColoredPropertySpace coloredPropertySpace = (ColoredPropertySpace) propertySpace;
 
     // player is not the owner
     if (!coloredPropertySpace.isOwnedBy(player)) {
-      return "You can only build on your own property.";
+      throw new InvalidMoveException("You can only build on your own property.");
     }
 
     // player does not own the whole color group
     char color = coloredPropertySpace.getColor();
     if (!playerOwnsWholeColorGroup(gameBoard, color, player)) {
-      return "You have to own all properties of a color group to start building.";
+      throw new InvalidMoveException("You have to own all properties of a color group to start building.");
     }
 
     // player can not afford the building
     int buildingPrice = coloredPropertySpace.getBuildingPrice();
     if (player.getMoney() < buildingPrice) {
-      return String.format("You can not afford to build for %d$.", buildingPrice);
+      throw new InvalidMoveException(String.format("You can not afford to build for $%d.", buildingPrice));
     }
 
     // property already has a hotel
     int numberOfBuildings = coloredPropertySpace.getNumberOfBuildings();
     if (numberOfBuildings == 5) {
-      return "You can not build more than one hotel on one property.";
+      throw new InvalidMoveException("You can not build more than one hotel on one property.");
     }
 
     // color group not built evenly
     int minNumberOfBuildings = getNumbersOfBuildings(gameBoard, color).min().orElseThrow();
     if (minNumberOfBuildings < numberOfBuildings) {
-      return "Houses and hotels must be built evenly across all properties of the same color group.";
+      throw new InvalidMoveException("Houses and hotels must be built evenly across all properties of the same color group.");
     }
 
     coloredPropertySpace.addBuilding();
     player.transferMoney(-buildingPrice);
-    return "";
+    throw new InvalidMoveException("");
   }
 
-  public static String unbuildOnSpace(GameBoard gameBoard, int propertyId, Player player) {
+  public static String unbuildOnSpace(GameBoard gameBoard, int propertyId, Player player) throws InvalidMoveException {
     PropertySpace[] propertySpaces = gameBoard.getPropertySpaces();
     int maxPropertyId = propertySpaces.length - 1;
 
     // id out of range
     if (propertyId < 0 || propertyId > maxPropertyId) {
-      return String.format("The property identifier must be between 0 and %d.", maxPropertyId);
+      throw new InvalidMoveException(String.format("The property identifier must be between 0 and %d.", maxPropertyId));
     }
     PropertySpace propertySpace = propertySpaces[propertyId];
 
     // property does not belong to a color group
     if (!(propertySpace instanceof ColoredPropertySpace)) {
-      return "You can not build on railroads and utility spaces.";
+      throw new InvalidMoveException("You can not build on railroads and utility spaces.");
     }
     ColoredPropertySpace coloredPropertySpace = (ColoredPropertySpace) propertySpace;
 
     // player is not the owner
     if (!coloredPropertySpace.isOwnedBy(player)) {
-      return "You can only build on your own property.";
+      throw new InvalidMoveException("You can only build on your own property.");
     }
 
     // property does not have a building
     int numberOfBuildings = coloredPropertySpace.getNumberOfBuildings();
     if (numberOfBuildings == 0) {
-      return "Property does not have a house or hotel to unbuild.";
+      throw new InvalidMoveException("Property does not have a house or hotel to unbuild.");
     }
 
     // color group not unbuilt evenly
     char color = coloredPropertySpace.getColor();
     int maxNumberOfBuildings = getNumbersOfBuildings(gameBoard, color).max().orElseThrow();
     if (maxNumberOfBuildings > numberOfBuildings) {
-      return "Houses and hotels must be built evenly across all properties of the same color group.";
+      throw new InvalidMoveException("Houses and hotels must be built evenly across all properties of the same color group.");
     }
 
     int buildingPrice = coloredPropertySpace.getBuildingPrice();
     coloredPropertySpace.removeBuilding();
     player.transferMoney(buildingPrice / 2);
-    return "";
+    throw new InvalidMoveException("");
   }
 
   public static void disownPlayerOfAllProperties(GameBoard gameBoard, Player player) {

@@ -5,14 +5,14 @@ import de.dhbw.ase.monopoly.*;
 public class TaxSpace extends BoardSpace {
   private final int tax;
 
-  public TaxSpace(String name, int tax) {
-    super(name);
+  public TaxSpace(String name, int tax, EventReceiver eventReceiver) {
+    super(name, eventReceiver);
     this.tax = tax;
   }
 
   @Override
-  public String enterSpace(Player player, int steps) {
+  public void enterSpace(Player player, int steps) {
     player.transferMoney(-tax);
-    return String.format("You were charged %d in %s.", tax, name);
+    eventReceiver.addEvent(String.format("You were charged $%d in %s.", tax, name));
   }
 }

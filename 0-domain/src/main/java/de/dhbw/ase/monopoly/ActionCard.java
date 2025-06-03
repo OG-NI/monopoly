@@ -11,5 +11,5 @@ public abstract class ActionCard { // TODO: extends value object
     return text;
   }
 
-  public abstract String performAction(Player player);
+  public abstract void performAction(Player player);
 }

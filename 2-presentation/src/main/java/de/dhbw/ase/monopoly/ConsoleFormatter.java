@@ -112,7 +112,7 @@ public final class ConsoleFormatter {
     for (int j = 0; j < row.length; j++) {
       String spaces = " ".repeat(maximums[j] - ansiStringLength(row[j]));
       if (row[j].matches("\\d.*")) {
-        // numbers alrigned right
+        // numbers aligned right
         s += spaces + row[j];
       } else if (row[j].contains("$")) {
         // spaces between dollar sign and number

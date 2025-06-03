@@ -9,8 +9,8 @@ public abstract class PropertySpace extends BoardSpace {
   protected final GameBoard gameBoard;
   protected Optional<Player> owner = Optional.empty();
 
-  public PropertySpace(String name, int price, int mortgage, GameBoard gameBoard) {
-    super(name);
+  public PropertySpace(String name, int price, int mortgage, GameBoard gameBoard, EventReceiver eventReceiver) {
+    super(name, eventReceiver);
     this.price = price;
     this.mortgage = mortgage;
     this.gameBoard = gameBoard;
@@ -38,18 +38,19 @@ public abstract class PropertySpace extends BoardSpace {
   }
 
   @Override
-  public String enterSpace(Player player, int steps) {
-    String spaceMessage = String.format("You entered %s.", name);
+  public void enterSpace(Player player, int steps) {
+    eventReceiver.addEvent(String.format("You entered %s.", name));
 
     // space is not yet owned by a player
     if (owner.isEmpty()) {
-      String buyMessage = String.format("The property is owned by the bank and can be bought for %d$.", price);
-      return UtilService.joinMessages(spaceMessage, buyMessage);
+      eventReceiver.addEvent(String.format("The property is owned by the bank and can be bought for $%d.", price));
+      return;
     }
 
     // no action if player enters his own space
     if (owner.get().equals(player)) {
-      return UtilService.joinMessages(spaceMessage, "The property belongs to you.");
+      eventReceiver.addEvent("The property belongs to you.");
+      return;
     }
 
     // TODO check for mortgaged property
@@ -57,9 +58,8 @@ public abstract class PropertySpace extends BoardSpace {
     int rent = getRent(steps);
     player.transferMoney(-rent);
     owner.get().transferMoney(rent);
-    String rentMessage = String.format("The property is owned by %s who collected %s$ in rent from you.",
-        owner.get().getPiece(), rent);
-    return UtilService.joinMessages(spaceMessage, rentMessage);
+    eventReceiver.addEvent(String.format("The property is owned by %s who collected $%d in rent from you.",
+        owner.get().getPiece(), rent));
   }
 
   public abstract int getRent(int steps);

@@ -7,18 +7,21 @@ import de.dhbw.ase.monopoly.spaces.BoardSpace;
 import de.dhbw.ase.monopoly.spaces.PropertySpace;
 
 public class Game {
-  private GameBoard gameBoard;
+  private final GameBoard gameBoard;
   private final Player[] players;
+  private final EventReceiver eventReceiver;
+
   private int curPlayerIdx;
   private boolean canRollDice = true;
   private int consecutiveDoubles = 0;
 
-  public Game(String[] playerPieces) {
-    gameBoard = new GameBoard(this);
+  public Game(String[] playerPieces, EventReceiver eventReceiver) {
+    gameBoard = new GameBoard(this, eventReceiver);
     players = Arrays.stream(playerPieces)
-        .map(piece -> new Player(piece, gameBoard))
+        .map(piece -> new Player(piece, gameBoard, eventReceiver))
         .toArray(Player[]::new);
     curPlayerIdx = (int) (Math.random() * playerPieces.length);
+    this.eventReceiver = eventReceiver;
   }
 
   public GameBoard getGameBoard() {
@@ -33,9 +36,10 @@ public class Game {
     return curPlayerIdx;
   }
 
-  public String rollDice() {
+  public void rollDice() {
     if (!canRollDice) {
-      return "You can not cast dice again.";
+      eventReceiver.addEvent("You can not cast dice again.");
+      return;
     }
 
     canRollDice = false;
@@ -43,34 +47,36 @@ public class Game {
     int die1 = randomDice();
     int die2 = randomDice();
 
-    String doublesJailMessage = "";
     if (curPlayer.isInJail()) {
       if (die1 == die2) {
         // leave jail for free after rolling doubles, use same roll to move
+        eventReceiver.addEvent("You rolled doubles and got out of jail for free.");
         curPlayer.getOutOfJail(true);
-        doublesJailMessage = "You rolled doubles and got out of jail for free.";
       } else {
         curPlayer.incConsecutiveNotDoublesInJail();
         if (curPlayer.mustGetOutOfJail()) {
           // player must get out of jail after not rolling doubles for three rounds while
           // being in jail, use same roll to move
+          eventReceiver.addEvent(
+              "You did not roll doubles three rounds in a row and had to get out of jail at your own expense.");
           curPlayer.getOutOfJail(false);
-          doublesJailMessage = "You did not roll doubles three rounds in a row and had to get out of jail at your own expense.";
         } else {
-          return "You did not roll doubles and stay in jail.";
+          eventReceiver.addEvent("You did not roll doubles and stay in jail.");
+          return;
         }
       }
     } else { // player is not in jail
       if (die1 == die2) {
         consecutiveDoubles++;
-        doublesJailMessage = "You rolled doubles and can therefore roll another time.";
 
         if (consecutiveDoubles == 3) {
-          // player must to to jail after rolling doubles for three rounds
+          // player must to to jail after rolling doubles for three consecutive rounds
+          eventReceiver.addEvent("You were caught speeding. Go to jail immediately.");
           curPlayer.goToJail();
-          return "You were speeding. Go to jail immediately.";
+          return;
         } else {
           // player can roll again after rolling doubles without going to jail
+          eventReceiver.addEvent("You rolled doubles and can therefore roll another time.");
           canRollDice = true;
         }
       } else {
@@ -79,87 +85,102 @@ public class Game {
     }
 
     int steps = die1 + die2;
-    String moveMessage = curPlayer.moveForward(steps);
-    return UtilService.joinMessages(doublesJailMessage, moveMessage);
+    curPlayer.moveForward(steps);
   }
 
   public boolean canRollDice() {
     return canRollDice;
   }
 
-  public String buyProperty() {
+  public void buyProperty() {
     Player curPlayer = players[curPlayerIdx];
     BoardSpace curSpace = gameBoard.getSpace(curPlayer.getPosition());
 
     if (!curSpace.isBuyable()) {
-      return "The property is not for sale.";
+      eventReceiver.addEvent("The property is not for sale.");
+      return;
     }
 
     PropertySpace propertySpace = (PropertySpace) curSpace;
     int propertyPrice = propertySpace.getPrice();
     if (propertyPrice > curPlayer.getMoney()) {
-      return "You can not afford this property";
+      eventReceiver.addEvent("You can not afford this property");
+      return;
     }
 
     curPlayer.buyProperty();
-    return "";
   }
 
-  public String buildOnProperty(int propertyId) {
+  public void buildOnProperty(int propertyId) {
     Player curPlayer = players[curPlayerIdx];
-    return BuildingService.buildOnSpace(gameBoard, propertyId, curPlayer);
+    try {
+      BuildingService.buildOnSpace(gameBoard, propertyId, curPlayer);
+    } catch (InvalidMoveException exception) {
+      eventReceiver.addEvent(exception.getMessage());
+    }
   }
 
-  public String unbuildOnProperty(int propertyId) {
+  public void unbuildOnProperty(int propertyId) {
     Player curPlayer = players[curPlayerIdx];
-    return BuildingService.unbuildOnSpace(gameBoard, propertyId, curPlayer);
+    try {
+      BuildingService.unbuildOnSpace(gameBoard, propertyId, curPlayer);
+    } catch (InvalidMoveException exception) {
+      eventReceiver.addEvent(exception.getMessage());
+    }
   }
 
-  public String getOutOfJail() {
+  public void getOutOfJail() {
     Player curPlayer = players[curPlayerIdx];
 
     if (!curPlayer.isInJail()) {
-      return "You are currently not in jail.";
+      eventReceiver.addEvent("You are currently not in jail.");
+      return;
     }
 
     if (!canRollDice) {
-      return "You can only get out of jail at the beginning of your turn.";
+      eventReceiver.addEvent("You can only get out of jail at the beginning of your turn.");
+      return;
     }
 
     if (curPlayer.getMoney() < 50 && curPlayer.getGetOutOfJailFreeCards() == 0) {
-      return "You need at least $50 or a card to get out of jail.";
+      eventReceiver.addEvent("You need at least $50 or a card to get out of jail.");
+      return;
     }
 
     curPlayer.getOutOfJail(false);
-    return "You got out of jail at your own expense.";
+    eventReceiver.addEvent("You got out of jail at your own expense.");
   }
 
-  public String nextPlayer() {
+  public void nextPlayer() {
     if (canRollDice) {
-      return "You can roll the dice another time before ending your turn.";
+      eventReceiver.addEvent("You can roll the dice another time before ending your turn.");
+      return;
     }
 
     Player curPlayer = players[curPlayerIdx];
     if (curPlayer.getMoney() < 0) {
-      return "You have to get out of debt before ending your turn. If that is not possible, you have to declare bankruptcy and leave the game.";
+      eventReceiver.addEvent(
+          "You have to get out of debt before ending your turn. If that is not possible, you have to declare bankruptcy and leave the game.");
+      return;
     }
 
     endTurn();
-    return "";
   }
 
-  public String declareBankruptcy() {
+  public void declareBankruptcy() {
     Player curPlayer = players[curPlayerIdx];
     if (curPlayer.getMoney() >= 0) {
-      return "You still have money left.";
+      eventReceiver.addEvent("You still have money left.");
+      return;
     }
     if (canRollDice) {
-      return "You can roll the dice another time.";
+      eventReceiver.addEvent("You can roll the dice another time.");
+      return;
     }
 
     curPlayer.makeBankrupt();
     endTurn();
-    return checkIfSinglePlayerIsLeft();
+    checkIfSinglePlayerIsLeft();
   }
 
   /**
@@ -186,15 +207,13 @@ public class Game {
     canRollDice = true;
   }
 
-  private String checkIfSinglePlayerIsLeft() {
+  private void checkIfSinglePlayerIsLeft() {
     long numberOfActivePlayers = Arrays.stream(players)
         .filter(player -> !player.isBankrupt())
         .count();
     if (numberOfActivePlayers == 1) {
       String piece = players[curPlayerIdx].getPiece();
-      return String.format("Player %s has won the game.", piece);
-    } else {
-      return "";
+      eventReceiver.addEvent(String.format("Player %s has won the game.", piece));
     }
   }
 }

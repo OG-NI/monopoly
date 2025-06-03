@@ -15,14 +15,15 @@ import de.dhbw.ase.monopoly.spaces.UtilitySpace;
 
 import static de.dhbw.ase.monopoly.Color.*;
 
-public class ConsoleUI {
+public class ConsoleUI implements EventReceiver {
   private Game game;
   private Scanner scanner = new Scanner(System.in);
+  private List<String> events = new ArrayList<>();
 
   public void start() {
     // String[] pieces = readPlayerPieces();
     String[] pieces = new String[] { Piece.DOG.toString(), Piece.SHIP.toString(), Piece.CAR.toString() };
-    game = new Game(pieces);
+    game = new Game(pieces, this);
     while (true) {
       printGameState();
       readAndExecuteCommand();
@@ -100,36 +101,43 @@ public class ConsoleUI {
     System.out.print(ConsoleFormatter.CLEAR_CONSOLE);
     String[] tokens = command.split(" ");
 
-    String message = "";
     if (tokens[0].equals("help")) {
       printHelp();
     } else if (tokens[0].equals("quit")) {
       System.exit(0);
     } else if (tokens[0].equals("roll")) {
-      message = game.rollDice();
+      game.rollDice();
     } else if (tokens[0].equals("buy")) {
-      message = game.buyProperty();
+      game.buyProperty();
     } else if (List.of("build", "unbuild").contains(tokens[0])) {
       if (tokens.length < 2) {
-        message = "Please enter a property identifier.";
-      } else if (!UtilService.isInteger(tokens[1])) {
-        message = "Only numbers are supported as property identifiers.";
+        addEvent("Please enter a property identifier.");
       } else {
-        int propertyId = Integer.parseInt(tokens[1]);
-        if (tokens[0].equals("build")) {
-          message = game.buildOnProperty(propertyId);
-        } else {
-          message = game.unbuildOnProperty(propertyId);
+        try {
+          int propertyId = Integer.parseInt(tokens[1]);
+          if (tokens[0].equals("build")) {
+            game.buildOnProperty(propertyId);
+          } else {
+            game.unbuildOnProperty(propertyId);
+          }
+        } catch (NumberFormatException exception) {
+          addEvent("Only numbers are supported as property identifiers.");
         }
       }
     } else if (tokens[0].equals("leave")) {
-      message = game.getOutOfJail();
+      game.getOutOfJail();
     } else if (tokens[0].equals("next")) {
-      message = game.nextPlayer();
+      game.nextPlayer();
     } else if (tokens[0].equals("bankrupt")) {
-      message = game.declareBankruptcy();
+      game.declareBankruptcy();
     }
-    printMessageAndWait(message);
+    printMessageAndWait(String.join("\n", events));
+    events.clear();
+  }
+
+  @Override
+  public void addEvent(String message) {
+    events.add("• " + message);
   }
 
   private String[][] getPropertySpacesState() {
