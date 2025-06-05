@@ -46,6 +46,9 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <outputFile>../monopoly.jar</outputFile>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
