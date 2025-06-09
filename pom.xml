@@ -20,7 +20,7 @@
     <modules>
         <module>0-domain</module>
         <module>1-application</module>
-        <module>2-presentation</module>
+        <module>2-plugins</module>
     </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
