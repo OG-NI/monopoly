@@ -79,6 +79,7 @@ public class Player {
 
   public void goToJail() {
     isInJail = true;
+    setCanRollDice(false);
   }
 
   public boolean isInJail() {
