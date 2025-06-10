@@ -40,34 +40,34 @@ public class BuildingService {
     PropertySpace propertySpace = propertySpaces[propertyId];
 
     // property does not belong to a color group
-    if (!(propertySpace instanceof ColoredPropertySpace)) {
+    if (!(propertySpace instanceof StreetSpace)) {
       eventReceiver.addEvent("You can not build on railroads and utility spaces.");
       return;
     }
-    ColoredPropertySpace coloredPropertySpace = (ColoredPropertySpace) propertySpace;
+    StreetSpace streetSpace = (StreetSpace) propertySpace;
 
     // player is not the owner
-    if (!coloredPropertySpace.isOwnedBy(currentPlayer)) {
+    if (!streetSpace.isOwnedBy(currentPlayer)) {
       eventReceiver.addEvent("You can only build on your own property.");
       return;
     }
 
     // player does not own the whole color group
-    char color = coloredPropertySpace.getColor();
+    char color = streetSpace.getColor();
     if (!propertyCountService.playerOwnsWholeColorGroup(currentPlayer, color)) {
       eventReceiver.addEvent("You have to own all properties of a color group to start building.");
       return;
     }
 
     // player can not afford the building
-    int buildingPrice = coloredPropertySpace.getBuildingPrice();
+    int buildingPrice = streetSpace.getBuildingPrice();
     if (currentPlayer.getMoney() < buildingPrice) {
       eventReceiver.addEvent(String.format("You can not afford to build for $%d.", buildingPrice));
       return;
     }
 
     // property already has a hotel
-    int numberOfBuildings = coloredPropertySpace.getNumberOfBuildings();
+    int numberOfBuildings = streetSpace.getNumberOfBuildings();
     if (numberOfBuildings == 5) {
       eventReceiver.addEvent("You can not build more than one hotel on one property.");
       return;
@@ -81,8 +81,10 @@ public class BuildingService {
       return;
     }
 
-    coloredPropertySpace.addBuilding();
+    streetSpace.addBuilding();
+    spaceRepository.update(streetSpace);
     currentPlayer.transferMoney(-buildingPrice);
+    playerRepository.update(currentPlayer);
   }
 
   public void unbuildOnSpace(int propertyId) {
@@ -98,27 +100,27 @@ public class BuildingService {
     PropertySpace propertySpace = propertySpaces[propertyId];
 
     // property does not belong to a color group
-    if (!(propertySpace instanceof ColoredPropertySpace)) {
+    if (!(propertySpace instanceof StreetSpace)) {
       eventReceiver.addEvent("You can not build on railroads and utility spaces.");
       return;
     }
-    ColoredPropertySpace coloredPropertySpace = (ColoredPropertySpace) propertySpace;
+    StreetSpace streetSpace = (StreetSpace) propertySpace;
 
     // player is not the owner
-    if (!coloredPropertySpace.isOwnedBy(currentPlayer)) {
+    if (!streetSpace.isOwnedBy(currentPlayer)) {
       eventReceiver.addEvent("You can only build on your own property.");
       return;
     }
 
     // property does not have a building
-    int numberOfBuildings = coloredPropertySpace.getNumberOfBuildings();
+    int numberOfBuildings = streetSpace.getNumberOfBuildings();
     if (numberOfBuildings == 0) {
       eventReceiver.addEvent("Property does not have a house or hotel to unbuild.");
       return;
     }
 
     // color group not unbuilt evenly
-    char color = coloredPropertySpace.getColor();
+    char color = streetSpace.getColor();
     int maxNumberOfBuildings = getNumbersOfBuildings(color).max().orElseThrow();
     if (maxNumberOfBuildings > numberOfBuildings) {
       eventReceiver.addEvent(
@@ -126,9 +128,11 @@ public class BuildingService {
       return;
     }
 
-    int buildingPrice = coloredPropertySpace.getBuildingPrice();
-    coloredPropertySpace.removeBuilding();
+    int buildingPrice = streetSpace.getBuildingPrice();
+    streetSpace.removeBuilding();
+    spaceRepository.update(streetSpace);
     currentPlayer.transferMoney(buildingPrice / 2);
+    playerRepository.update(currentPlayer);
   }
 
   public void disownPlayerOfAllProperties(Player player) {
@@ -140,7 +144,7 @@ public class BuildingService {
 
     // TODO sell buildings and give money to player responsible for bankrupting
     // remove remaining buildings
-    Arrays.stream(spaceRepository.getColoredPropertySpaces())
+    Arrays.stream(spaceRepository.getStreetSpaces())
         .filter(space -> space.isOwnedBy(player))
         .forEach(space -> {
           while (space.getNumberOfBuildings() > 0) {
@@ -154,8 +158,8 @@ public class BuildingService {
    * this is used to check if houses and hotels are built evenly
    */
   private IntStream getNumbersOfBuildings(char color) {
-    ColoredPropertySpace[] coloredPropertySpaces = spaceRepository.getColoredPropertySpaces();
-    return Arrays.stream(coloredPropertySpaces)
+    StreetSpace[] streetSpaces = spaceRepository.getStreetSpaces();
+    return Arrays.stream(streetSpaces)
         .filter(space -> space.getColor() == color)
         .mapToInt(space -> space.getNumberOfBuildings());
   }

@@ -3,7 +3,7 @@ package de.dhbw.ase.monopoly.entities;
 import de.dhbw.ase.monopoly.*;
 import de.dhbw.ase.monopoly.services.PropertyCountService;
 
-public class ColoredPropertySpace extends PropertySpace {
+public class StreetSpace extends PropertySpace {
   private final char color;
   private final int buildingPrice;
   private final int[] rents;
@@ -11,7 +11,7 @@ public class ColoredPropertySpace extends PropertySpace {
 
   private final PropertyCountService propertyCountService;
 
-  public ColoredPropertySpace(String name, int price, int mortgage, char color, int buildingPrice, int[] rents,
+  public StreetSpace(String name, int price, int mortgage, char color, int buildingPrice, int[] rents,
       EventReceiver eventReceiver, PropertyCountService propertyCountService) {
     super(name, price, mortgage, eventReceiver);
     this.color = color;

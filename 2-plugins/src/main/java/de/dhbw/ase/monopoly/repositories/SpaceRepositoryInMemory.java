@@ -43,10 +43,10 @@ public class SpaceRepositoryInMemory implements SpaceRepository {
   }
 
   @Override
-  public ColoredPropertySpace[] getColoredPropertySpaces() {
+  public StreetSpace[] getStreetSpaces() {
     return Arrays.stream(spaces)
-        .filter(s -> s instanceof ColoredPropertySpace)
-        .toArray(ColoredPropertySpace[]::new);
+        .filter(s -> s instanceof StreetSpace)
+        .toArray(StreetSpace[]::new);
   }
 
   @Override

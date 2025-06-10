@@ -15,11 +15,11 @@ public class PropertyCountService {
   }
 
   public boolean playerOwnsWholeColorGroup(Player player, char color) {
-    ColoredPropertySpace[] coloredPropertySpaces = spaceRepository.getColoredPropertySpaces();
+    StreetSpace[] streetSpaces = spaceRepository.getStreetSpaces();
 
-    boolean existsPropertyNotOwnedByPlayer = Arrays.stream(coloredPropertySpaces)
+    boolean existsStreetNotOwnedByPlayer = Arrays.stream(streetSpaces)
         .anyMatch(s -> !s.isOwnedBy(player) && s.getColor() == color);
-    return !existsPropertyNotOwnedByPlayer;
+    return !existsStreetNotOwnedByPlayer;
   }
 
   public int getPlayerRailroadCount(Player player) {
@@ -40,9 +40,9 @@ public class PropertyCountService {
 
   public int getCurrentPlayerHouseCount() {
     Player currentPlayer = playerRepository.getCurrentPlayer();
-    ColoredPropertySpace[] coloredPropertySpaces = spaceRepository.getColoredPropertySpaces();
+    StreetSpace[] streetSpaces = spaceRepository.getStreetSpaces();
 
-    return Arrays.stream(coloredPropertySpaces)
+    return Arrays.stream(streetSpaces)
         .filter(s -> s.isOwnedBy(currentPlayer) && !s.hasHotel())
         .mapToInt(s -> s.getNumberOfBuildings())
         .sum();
@@ -50,9 +50,9 @@ public class PropertyCountService {
 
   public int getCurrentPlayerHotelCount() {
     Player currentPlayer = playerRepository.getCurrentPlayer();
-    ColoredPropertySpace[] coloredPropertySpaces = spaceRepository.getColoredPropertySpaces();
+    StreetSpace[] streetSpaces = spaceRepository.getStreetSpaces();
 
-    return (int) Arrays.stream(coloredPropertySpaces)
+    return (int) Arrays.stream(streetSpaces)
         .filter(s -> s.isOwnedBy(currentPlayer) && s.hasHotel())
         .count();
   }

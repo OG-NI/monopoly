@@ -5,8 +5,6 @@ import de.dhbw.ase.monopoly.entities.Player;
 public interface PlayerRepository {
   public void init(Player[] players);
 
-  public int getNumberOfPlayers();
-
   public int getNumberOfSolventPlayers();
 
   public Player getCurrentPlayer();

@@ -103,7 +103,7 @@ public final class ConsoleBoard {
   }
 
   private static String[] initBoardWithoutPieces() {
-    String coloredProperty = "▔▔▔";
+    String street = "▔▔▔";
     String rowSeparator = "├───┤                                   ├───┤";
     String rowSpacer = "│                                   │";
     String rowDelimiter = "│";
@@ -112,14 +112,14 @@ public final class ConsoleBoard {
     String chestStack = "│               " + colorText("  󰜦  ", WHITE, BLUE) + "               │";
     String chanceStack = "│               " + colorText("    ", WHITE, ORANGE) + "               │";
 
-    String brownProperty = colorText(coloredProperty, BROWN, BACKGROUND);
-    String lightBlueProperty = colorText(coloredProperty, LIGHT_BLUE, BACKGROUND);
-    String pinkProperty = colorText(coloredProperty, PINK, BACKGROUND);
-    String orangeProperty = colorText(coloredProperty, ORANGE, BACKGROUND);
-    String redProperty = colorText(coloredProperty, RED, BACKGROUND);
-    String yellowProperty = colorText(coloredProperty, YELLOW, BACKGROUND);
-    String greenProperty = colorText(coloredProperty, GREEN, BACKGROUND);
-    String blueProperty = colorText(coloredProperty, DARK_BLUE, BACKGROUND);
+    String brownProperty = colorText(street, BROWN, BACKGROUND);
+    String lightBlueProperty = colorText(street, LIGHT_BLUE, BACKGROUND);
+    String pinkProperty = colorText(street, PINK, BACKGROUND);
+    String orangeProperty = colorText(street, ORANGE, BACKGROUND);
+    String redProperty = colorText(street, RED, BACKGROUND);
+    String yellowProperty = colorText(street, YELLOW, BACKGROUND);
+    String greenProperty = colorText(street, GREEN, BACKGROUND);
+    String blueProperty = colorText(street, DARK_BLUE, BACKGROUND);
 
     String chest = colorText(" 󰜦 ", BLUE, BACKGROUND);
     String pinkChance = colorText("  ", PINK, BACKGROUND);

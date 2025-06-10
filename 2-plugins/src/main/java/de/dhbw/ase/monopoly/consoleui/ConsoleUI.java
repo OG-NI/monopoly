@@ -126,35 +126,48 @@ public class ConsoleUI implements EventReceiver {
     System.out.print(ConsoleFormatter.CLEAR_CONSOLE);
     String[] tokens = command.split(" ");
 
-    if (tokens[0].equals("help")) {
-      printHelp();
-    } else if (tokens[0].equals("quit")) {
-      System.exit(0);
-    } else if (tokens[0].equals("roll")) {
-      rollDiceService.rollDice();
-    } else if (tokens[0].equals("buy")) {
-      buyPropertyService.buyProperty();
-    } else if (List.of("build", "unbuild").contains(tokens[0])) {
-      if (tokens.length < 2) {
-        addEvent("Please enter a property identifier.");
-      } else {
-        try {
-          int propertyId = Integer.parseInt(tokens[1]);
-          if (tokens[0].equals("build")) {
-            buildingService.buildOnSpace(propertyId);
-          } else {
-            buildingService.unbuildOnSpace(propertyId);
+    switch (tokens[0]) {
+      case "help":
+        printHelp();
+        break;
+      case "quit":
+        System.exit(0);
+        break;
+      case "roll":
+        rollDiceService.rollDice();
+        break;
+      case "buy":
+        buyPropertyService.buyProperty();
+        break;
+      case "build":
+      case "unbuild":
+        if (tokens.length < 2) {
+          addEvent("Please enter a property identifier.");
+        } else {
+          try {
+            int propertyId = Integer.parseInt(tokens[1]);
+            if (tokens[0].equals("build")) {
+              buildingService.buildOnSpace(propertyId);
+            } else {
+              buildingService.unbuildOnSpace(propertyId);
+            }
+          } catch (NumberFormatException exception) {
+            addEvent("Only numbers are supported as property identifiers.");
           }
-        } catch (NumberFormatException exception) {
-          addEvent("Only numbers are supported as property identifiers.");
         }
-      }
-    } else if (tokens[0].equals("leave")) {
-      turnChangeService.getOutOfJail();
-    } else if (tokens[0].equals("next")) {
-      turnChangeService.nextPlayer();
-    } else if (tokens[0].equals("bankrupt")) {
-      turnChangeService.declareBankruptcy();
+        break;
+      case "leave":
+        turnChangeService.getOutOfJail();
+        break;
+      case "next":
+        turnChangeService.nextPlayer();
+        break;
+      case "bankrupt":
+        turnChangeService.declareBankruptcy();
+        break;
+      default:
+        addEvent("Unknown command.");
+        break;
     }
     printMessageAndWait(String.join("\n", events));
     events.clear();
@@ -246,9 +259,9 @@ public class ConsoleUI implements EventReceiver {
   }
 
   private String getIconForPropertySpace(PropertySpace propertySpace) {
-    if (propertySpace instanceof ColoredPropertySpace) {
-      ColoredPropertySpace coloredPropertySpace = (ColoredPropertySpace) propertySpace;
-      Color color = Color.byChar(coloredPropertySpace.getColor());
+    if (propertySpace instanceof StreetSpace) {
+      StreetSpace streetSpace = (StreetSpace) propertySpace;
+      Color color = Color.byChar(streetSpace.getColor());
       return ConsoleFormatter.colorText("▔▔▔", color, Color.BACKGROUND);
     } else if (propertySpace instanceof RailroadSpace) {
       return ConsoleFormatter.colorText("  ", BLACK, BACKGROUND);
@@ -261,12 +274,12 @@ public class ConsoleUI implements EventReceiver {
   }
 
   private String getIconForBuildings(PropertySpace propertySpace) {
-    if (!(propertySpace instanceof ColoredPropertySpace)) {
+    if (!(propertySpace instanceof StreetSpace)) {
       return "";
     }
 
-    ColoredPropertySpace coloredPropertySpace = (ColoredPropertySpace) propertySpace;
-    int numberOfHouses = coloredPropertySpace.getNumberOfBuildings();
+    StreetSpace streetSpace = (StreetSpace) propertySpace;
+    int numberOfHouses = streetSpace.getNumberOfBuildings();
     if (numberOfHouses <= 4) {
       return ConsoleFormatter.colorText(" ".repeat(numberOfHouses), GREEN);
     } else {

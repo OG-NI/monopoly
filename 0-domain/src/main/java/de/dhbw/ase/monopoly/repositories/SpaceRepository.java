@@ -10,7 +10,7 @@ public interface SpaceRepository {
 
   public BoardSpace get(int position);
   public PropertySpace[] getPropertySpaces();
-  public ColoredPropertySpace[] getColoredPropertySpaces();
+  public StreetSpace[] getStreetSpaces();
   public RailroadSpace[] getRailroadSpaces();
   public UtilitySpace[] getUtilitySpaces();
 

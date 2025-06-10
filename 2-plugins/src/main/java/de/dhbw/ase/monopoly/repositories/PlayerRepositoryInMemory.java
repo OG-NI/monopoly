@@ -13,11 +13,6 @@ public class PlayerRepositoryInMemory implements PlayerRepository {
   }
 
   @Override
-  public int getNumberOfPlayers() {
-    return players.length;
-  }
-
-  @Override
   public int getNumberOfSolventPlayers() {
     return (int) Arrays.stream(players)
         .filter(player -> !player.isBankrupt())
