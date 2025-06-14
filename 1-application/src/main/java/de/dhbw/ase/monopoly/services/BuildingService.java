@@ -14,7 +14,8 @@ public class BuildingService {
   private final SpaceRepository spaceRepository;
   private final PropertyCountService propertyCountService;
 
-  public BuildingService(EventReceiver eventReceiver, PlayerRepository playerRepository, SpaceRepository spaceRepository,
+  public BuildingService(EventReceiver eventReceiver, PlayerRepository playerRepository,
+      SpaceRepository spaceRepository,
       PropertyCountService propertyCountService) {
     this.eventReceiver = eventReceiver;
     this.playerRepository = playerRepository;
@@ -28,31 +29,15 @@ public class BuildingService {
    * @param propertyId index on the game board just including property spaces
    */
   public void buildOnSpace(int propertyId) {
-    Player currentPlayer = playerRepository.getCurrentPlayer();
-    PropertySpace[] propertySpaces = spaceRepository.getPropertySpaces();
-    int maxPropertyId = propertySpaces.length - 1;
-
-    // id out of range
-    if (propertyId < 0 || propertyId > maxPropertyId) {
-      eventReceiver.addEvent(String.format("The property identifier must be between 0 and %d.", maxPropertyId));
-      return;
-    }
-    PropertySpace propertySpace = propertySpaces[propertyId];
-
-    // property does not belong to a color group
-    if (!(propertySpace instanceof StreetSpace)) {
-      eventReceiver.addEvent("You can not build on railroads and utility spaces.");
-      return;
-    }
-    StreetSpace streetSpace = (StreetSpace) propertySpace;
-
-    // player is not the owner
-    if (!streetSpace.isOwnedBy(currentPlayer)) {
-      eventReceiver.addEvent("You can only build on your own property.");
+    StreetSpace streetSpace;
+    try {
+      streetSpace = parsePropertyId(propertyId);
+    } catch (PropertyIdException exception) {
       return;
     }
 
     // player does not own the whole color group
+    Player currentPlayer = playerRepository.getCurrentPlayer();
     char color = streetSpace.getColor();
     if (!propertyCountService.playerOwnsWholeColorGroup(currentPlayer, color)) {
       eventReceiver.addEvent("You have to own all properties of a color group to start building.");
@@ -88,27 +73,10 @@ public class BuildingService {
   }
 
   public void unbuildOnSpace(int propertyId) {
-    Player currentPlayer = playerRepository.getCurrentPlayer();
-    PropertySpace[] propertySpaces = spaceRepository.getPropertySpaces();
-    int maxPropertyId = propertySpaces.length - 1;
-
-    // id out of range
-    if (propertyId < 0 || propertyId > maxPropertyId) {
-      eventReceiver.addEvent(String.format("The property identifier must be between 0 and %d.", maxPropertyId));
-      return;
-    }
-    PropertySpace propertySpace = propertySpaces[propertyId];
-
-    // property does not belong to a color group
-    if (!(propertySpace instanceof StreetSpace)) {
-      eventReceiver.addEvent("You can not build on railroads and utility spaces.");
-      return;
-    }
-    StreetSpace streetSpace = (StreetSpace) propertySpace;
-
-    // player is not the owner
-    if (!streetSpace.isOwnedBy(currentPlayer)) {
-      eventReceiver.addEvent("You can only build on your own property.");
+    StreetSpace streetSpace;
+    try {
+      streetSpace = parsePropertyId(propertyId);
+    } catch (PropertyIdException exception) {
       return;
     }
 
@@ -128,6 +96,7 @@ public class BuildingService {
       return;
     }
 
+    Player currentPlayer = playerRepository.getCurrentPlayer();
     int buildingPrice = streetSpace.getBuildingPrice();
     streetSpace.removeBuilding();
     spaceRepository.update(streetSpace);
@@ -153,6 +122,32 @@ public class BuildingService {
         });
   }
 
+  private StreetSpace parsePropertyId(int propertyId) throws PropertyIdException {
+    PropertySpace[] propertySpaces = spaceRepository.getPropertySpaces();
+    int maxPropertyId = propertySpaces.length - 1;
+
+    // id out of range
+    if (propertyId < 0 || propertyId > maxPropertyId) {
+      eventReceiver.addEvent(String.format("The property identifier must be between 0 and %d.", maxPropertyId));
+      throw new PropertyIdException();
+    }
+    PropertySpace propertySpace = propertySpaces[propertyId];
+
+    if (!(propertySpace instanceof StreetSpace)) {
+      eventReceiver.addEvent("You can not build on railroads and utility spaces.");
+      throw new PropertyIdException();
+    }
+    StreetSpace streetSpace = (StreetSpace) propertySpace;
+
+    Player currentPlayer = playerRepository.getCurrentPlayer();
+    if (!streetSpace.isOwnedBy(currentPlayer)) {
+      eventReceiver.addEvent("You can only build on your own property.");
+      throw new PropertyIdException();
+    }
+
+    return streetSpace;
+  }
+
   /**
    * get numbers of buildings on all properties in a color group
    * this is used to check if houses and hotels are built evenly
@@ -162,5 +157,8 @@ public class BuildingService {
     return Arrays.stream(streetSpaces)
         .filter(space -> space.getColor() == color)
         .mapToInt(space -> space.getNumberOfBuildings());
+  }
+
+  private class PropertyIdException extends Exception {
   }
 }
