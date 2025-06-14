@@ -18,7 +18,7 @@ public class MovementService {
     this.spaceRepository = spaceRepository;
   }
 
-  public void moveForward(int steps) {
+  public void moveSteps(int steps) {
     int boardSize = spaceRepository.getNumberOfSpaces();
     Player currentPlayer = playerRepository.getCurrentPlayer();
     int position = currentPlayer.getPosition();
@@ -42,9 +42,9 @@ public class MovementService {
     int playerPosition = currentPlayer.getPosition();
 
     if (position > playerPosition) {
-      moveForward(position - playerPosition);
+      moveSteps(position - playerPosition);
     } else {
-      moveForward(boardSize + position - playerPosition);
+      moveSteps(boardSize + position - playerPosition);
     }
   }
 

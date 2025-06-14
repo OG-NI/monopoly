@@ -105,7 +105,7 @@ public class ActionCardService {
       return;
     }
 
-    movementService.moveForward(actionCard.moveSteps);
+    movementService.moveSteps(actionCard.moveSteps);
   }
 
   private void moveToJail(ActionCard actionCard) {

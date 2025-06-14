@@ -68,7 +68,7 @@ public class RollDiceService {
     }
 
     int steps = die1 + die2;
-    movementService.moveForward(steps);
+    movementService.moveSteps(steps);
   }
 
   private int randomDice() {
