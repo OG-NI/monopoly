@@ -34,7 +34,10 @@ public class StartService {
     actionCardRepository.init(ActionCardsGenerator.generateActionCards());
     spaceRepository.init(SpacesGenerator.generateSpaces(
         eventReceiver, movementService, propertyCountService, actionCardService));
+    initPlayers(pieces);
+  }
 
+  private void initPlayers(String[] pieces) {
     Player[] players = Arrays.stream(pieces)
         .map(Player::new).toArray(Player[]::new);
     int firstPlayerIndex = (int) (Math.random() * players.length);
