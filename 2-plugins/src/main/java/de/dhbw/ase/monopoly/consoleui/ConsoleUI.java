@@ -46,8 +46,8 @@ public class ConsoleUI implements EventReceiver {
   }
 
   public void start() {
-    // String[] pieces = readPlayerPieces();
-    String[] pieces = new String[] { Piece.DOG.toString(), Piece.SHIP.toString(), Piece.CAR.toString() };
+    String[] pieces = readPlayerPieces();
+    // String[] pieces = new String[] { Piece.DOG.toString(), Piece.SHIP.toString(), Piece.CAR.toString() };
     startService.start(pieces);
     while (true) {
       printGameState();
