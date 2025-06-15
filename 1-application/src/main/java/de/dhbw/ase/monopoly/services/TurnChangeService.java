@@ -64,6 +64,7 @@ public class TurnChangeService {
     }
 
     currentPlayer.makeBankrupt();
+    // TODO: sell property and buildings back to bank
     endTurn();
     checkIfSinglePlayerIsLeft();
   }

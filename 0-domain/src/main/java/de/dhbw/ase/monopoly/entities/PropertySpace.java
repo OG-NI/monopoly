@@ -40,13 +40,11 @@ public abstract class PropertySpace extends BoardSpace {
   public void enterSpace(Player player, int steps) {
     eventReceiver.addEvent(String.format("You entered %s.", name));
 
-    // space is not yet owned by a player
     if (owner.isEmpty()) {
       eventReceiver.addEvent(String.format("The property is owned by the bank and can be bought for $%d.", price));
       return;
     }
 
-    // no action if player enters his own space
     if (owner.get().equals(player)) {
       eventReceiver.addEvent("The property belongs to you.");
       return;

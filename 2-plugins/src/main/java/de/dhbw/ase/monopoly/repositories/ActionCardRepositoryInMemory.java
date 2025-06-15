@@ -8,6 +8,7 @@ import de.dhbw.ase.monopoly.valueobjects.ActionCard;
 public class ActionCardRepositoryInMemory implements ActionCardRepository {
   private ActionCard[] actionCards;
 
+  @Override
   public void init(ActionCard[] actionCards) {
     this.actionCards = actionCards;
   }
